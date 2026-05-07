@@ -1,12 +1,3 @@
-﻿// AUTO LOGIN (temporary fix)
-if (!localStorage.getItem("currentUser")) {
-    localStorage.setItem("currentUser", JSON.stringify({
-        name: "Admin User",
-        email: "admin@test.com",
-        role: "admin"
-    }));
-}
-
 // ===== STORAGE HELPERS =====
 function getStorage(key) {
     return JSON.parse(localStorage.getItem(key)) || [];
@@ -295,7 +286,12 @@ function setStorage(key, value) {
 
 function getCurrentUser() {
     try {
-        return JSON.parse(localStorage.getItem('globe_current_user') || 'null');
+        const storedUser = localStorage.getItem('globe_current_user');
+        if (storedUser) return JSON.parse(storedUser);
+        if (localStorage.getItem('loggedIn') === 'true') {
+            return JSON.parse(localStorage.getItem('currentUser') || 'null');
+        }
+        return null;
     } catch (error) {
         return null;
     }
@@ -303,10 +299,85 @@ function getCurrentUser() {
 
 function setCurrentUser(user) {
     localStorage.setItem('globe_current_user', JSON.stringify(user));
+    localStorage.setItem('loggedIn', 'true');
+    localStorage.setItem('userEmail', user.email);
 }
 
 function clearCurrentUser() {
     localStorage.removeItem('globe_current_user');
+    localStorage.removeItem('currentUser');
+    localStorage.removeItem('loggedIn');
+    localStorage.removeItem('userEmail');
+}
+
+function showMessage(element, message, type = 'danger') {
+    if (!element) return;
+    element.classList.remove('text-danger', 'text-success', 'text-warning');
+    element.classList.add(`text-${type}`);
+    element.innerText = message;
+}
+
+function isValidEmail(email) {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+
+function isValidPhone(phone) {
+    return /^[0-9+\-\s()]{7,20}$/.test(phone);
+}
+
+function escapeHtml(value) {
+    return String(value)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+}
+
+function sendToLogin(message, redirectUrl = window.location.href) {
+    localStorage.setItem('authNotice', message);
+    localStorage.setItem('loginRedirect', redirectUrl);
+    window.location.href = 'login.html';
+}
+
+function initAuthNav() {
+    const authLinks = document.querySelectorAll('[data-auth-link], #authLink');
+    if (!authLinks.length) return;
+
+    const currentUser = getCurrentUser();
+
+    authLinks.forEach(link => {
+        if (currentUser) {
+            link.innerText = 'Logout';
+            link.href = '#';
+            link.addEventListener('click', event => {
+                event.preventDefault();
+                clearCurrentUser();
+                window.location.href = 'login.html';
+            });
+        } else {
+            link.innerText = 'Sign in';
+            link.href = 'login.html';
+        }
+    });
+}
+
+function initProtectedBookingLinks() {
+    document.addEventListener('click', event => {
+        const bookingTarget = event.target.closest('a[href*="booking.html"], button[onclick*="booking.html"], #bookNowBtn');
+        if (!bookingTarget || getCurrentUser()) return;
+
+        event.preventDefault();
+        event.stopImmediatePropagation();
+
+        const href = bookingTarget.getAttribute('href');
+        const onclick = bookingTarget.getAttribute('onclick') || '';
+        const inlineMatch = onclick.match(/booking\.html\?id=\d+/);
+        const detailRedirect = bookingTarget.id === 'bookNowBtn' ? `booking.html${window.location.search}` : 'packages.html';
+        const redirectUrl = href && href !== '#' ? href : inlineMatch ? inlineMatch[0] : detailRedirect;
+
+        sendToLogin('Please log in before booking a package.', redirectUrl);
+    }, true);
 }
 
 function ensureDefaultData() {
@@ -392,20 +463,30 @@ function initRegisterForm() {
         const confirm = confirmInput.value.trim();
         const role = roleInput.value;
 
-        messageArea.innerText = '';
+        showMessage(messageArea, '', 'danger');
 
         if (!name || !email || !password || !confirm || !role) {
-            messageArea.innerText = 'Please complete all fields.';
+            showMessage(messageArea, 'Please complete all fields.');
+            return;
+        }
+
+        if (!isValidEmail(email)) {
+            showMessage(messageArea, 'Please enter a valid email address.');
+            return;
+        }
+
+        if (password.length < 6) {
+            showMessage(messageArea, 'Password must be at least 6 characters.');
             return;
         }
 
         if (password !== confirm) {
-            messageArea.innerText = 'Passwords do not match.';
+            showMessage(messageArea, 'Passwords do not match.');
             return;
         }
 
         if (findUser(email)) {
-            messageArea.innerText = 'An account with this email already exists.';
+            showMessage(messageArea, 'An account with this email already exists.');
             return;
         }
 
@@ -419,9 +500,7 @@ function initRegisterForm() {
             approved: role === 'user'
         });
         setStorage('users', users);
-        messageArea.classList.remove('text-danger');
-        messageArea.classList.add('text-success');
-        messageArea.innerText = role === 'user' ? 'Registration complete. Please log in.' : 'Registration submitted. Admin approval is required.';
+        showMessage(messageArea, role === 'user' ? 'Registration complete. Please log in.' : 'Registration submitted. Admin approval is required.', 'success');
         form.reset();
         setTimeout(() => { window.location.href = 'login.html'; }, 1800);
     });
@@ -434,31 +513,44 @@ function initLoginForm() {
     const emailInput = document.getElementById('loginEmail');
     const passwordInput = document.getElementById('loginPassword');
     const messageArea = document.getElementById('loginMessage');
+    const notice = localStorage.getItem('authNotice');
+    if (notice) {
+        showMessage(messageArea, notice, 'warning');
+        localStorage.removeItem('authNotice');
+    }
 
     form.addEventListener('submit', event => {
         event.preventDefault();
         const email = emailInput.value.trim();
         const password = passwordInput.value.trim();
-        messageArea.innerText = '';
+        showMessage(messageArea, '', 'danger');
 
         if (!email || !password) {
-            messageArea.innerText = 'Please enter both email and password.';
+            showMessage(messageArea, 'Please enter both email and password.');
+            return;
+        }
+
+        if (!isValidEmail(email)) {
+            showMessage(messageArea, 'Please enter a valid email address.');
             return;
         }
 
         const user = findUser(email);
         if (!user || user.password !== password) {
-            messageArea.innerText = 'Invalid email or password.';
+            showMessage(messageArea, 'Invalid email or password.');
             return;
         }
 
         if (user.role !== 'user' && !user.approved) {
-            messageArea.innerText = 'Your account is awaiting admin approval.';
+            showMessage(messageArea, 'Your account is awaiting admin approval.');
             return;
         }
 
         setCurrentUser(user);
-        window.location.href = 'dashboard.html';
+
+        const redirectUrl = localStorage.getItem('loginRedirect') || 'dashboard.html';
+        localStorage.removeItem('loginRedirect');
+        window.location.href = redirectUrl;
     });
 }
 
@@ -496,6 +588,9 @@ function initBookingPage() {
     }
 
     const currentUser = getCurrentUser();
+    if (!currentUser) {
+        showMessage(messageArea, 'Please log in before booking a package.', 'warning');
+    }
     if (currentUser) {
         if (nameInput) nameInput.value = currentUser.name;
         if (emailInput) emailInput.value = currentUser.email;
@@ -508,8 +603,15 @@ function initBookingPage() {
 
         if (messageArea) messageArea.innerText = '';
 
+        if (!getCurrentUser()) {
+            showMessage(messageArea, 'Please log in before booking a package.', 'warning');
+            localStorage.setItem('loginRedirect', window.location.href);
+            setTimeout(() => { window.location.href = 'login.html'; }, 900);
+            return;
+        }
+
         if (!pkg) {
-            if (messageArea) messageArea.innerText = 'Please select a valid package first.';
+            showMessage(messageArea, 'Please select a valid package first.');
             return;
         }
 
@@ -521,7 +623,27 @@ function initBookingPage() {
         const guests = guestsInput?.value.trim();
 
         if (!name || !email || !phone || !travel || !ret || !guests) {
-            if (messageArea) messageArea.innerText = 'Please complete all booking fields.';
+            showMessage(messageArea, 'Please complete all booking fields.');
+            return;
+        }
+
+        if (!isValidEmail(email)) {
+            showMessage(messageArea, 'Please enter a valid email address.');
+            return;
+        }
+
+        if (!isValidPhone(phone)) {
+            showMessage(messageArea, 'Please enter a valid phone number.');
+            return;
+        }
+
+        if (new Date(ret) < new Date(travel)) {
+            showMessage(messageArea, 'Return date cannot be before the travel date.');
+            return;
+        }
+
+        if (Number(guests) < 1) {
+            showMessage(messageArea, 'Guests must be at least 1.');
             return;
         }
 
@@ -555,9 +677,18 @@ function initPaymentPage() {
     const paymentPackageSummary = document.getElementById('paymentPackageSummary');
     const paymentTotal = document.getElementById('paymentTotal');
     const paymentMessage = document.getElementById('paymentMessage');
+    const cardNumberInput = document.getElementById('cardNumber');
+    const cardHolderInput = document.getElementById('cardHolder');
+    const cardExpiryInput = document.getElementById('cardExpiry');
+    const cardCvvInput = document.getElementById('cardCvv');
     const bookingId = Number(new URLSearchParams(window.location.search).get('bookingId'));
     const bookings = getStorage('bookings');
     const booking = bookings.find(b => b.id === bookingId);
+    const currentUser = getCurrentUser();
+
+    if (paymentForm && !currentUser) {
+        showMessage(paymentMessage, 'Please log in before completing payment.', 'warning');
+    }
 
     if (booking && paymentPackageName) {
         paymentPackageName.innerText = booking.packageName;
@@ -568,31 +699,203 @@ function initPaymentPage() {
     if (!paymentForm) return;
     paymentForm.addEventListener('submit', event => {
         event.preventDefault();
-        paymentMessage.innerText = '';
+        showMessage(paymentMessage, '', 'danger');
+        if (!getCurrentUser()) {
+            showMessage(paymentMessage, 'Please log in before completing payment.', 'warning');
+            localStorage.setItem('loginRedirect', window.location.href);
+            setTimeout(() => { window.location.href = 'login.html'; }, 900);
+            return;
+        }
+
         if (!booking) {
-            paymentMessage.innerText = 'No booking found to pay for.';
+            showMessage(paymentMessage, 'No booking found to pay for.');
+            return;
+        }
+
+        const activeUser = getCurrentUser();
+        if (normalizeRole(activeUser.role) === 'user' && booking.userEmail.toLowerCase() !== activeUser.email.toLowerCase()) {
+            showMessage(paymentMessage, 'This booking belongs to another account.');
+            return;
+        }
+
+        const cardNumber = cardNumberInput?.value.replace(/\s/g, '') || '';
+        const cardHolder = cardHolderInput?.value.trim() || '';
+        const cardExpiry = cardExpiryInput?.value || '';
+        const cardCvv = cardCvvInput?.value.trim() || '';
+
+        if (!/^\d{13,19}$/.test(cardNumber)) {
+            showMessage(paymentMessage, 'Please enter a valid card number.');
+            return;
+        }
+
+        if (cardHolder.length < 3) {
+            showMessage(paymentMessage, 'Please enter the card holder name.');
+            return;
+        }
+
+        if (!cardExpiry) {
+            showMessage(paymentMessage, 'Please select the card expiration date.');
+            return;
+        }
+
+        const [expiryYear, expiryMonth] = cardExpiry.split('-').map(Number);
+        const expiryDate = new Date(expiryYear, expiryMonth);
+        const today = new Date();
+        today.setDate(1);
+        today.setHours(0, 0, 0, 0);
+        if (expiryDate <= today) {
+            showMessage(paymentMessage, 'Card expiration date must be in the future.');
+            return;
+        }
+
+        if (!/^\d{3,4}$/.test(cardCvv)) {
+            showMessage(paymentMessage, 'Please enter a valid CVV.');
             return;
         }
 
         const payments = getStorage('payments');
-        payments.push({
+        const payment = {
             id: payments.length + 1,
             bookingId: booking.id,
             userEmail: booking.userEmail,
             amount: booking.total,
             status: 'Paid',
             date: new Date().toISOString()
-        });
+        };
+        payments.push(payment);
         setStorage('payments', payments);
 
         const updatedBookings = bookings.map(b => b.id === booking.id ? { ...b, status: 'Confirmed' } : b);
         setStorage('bookings', updatedBookings);
 
-        paymentMessage.classList.remove('text-danger');
-        paymentMessage.classList.add('text-success');
-        paymentMessage.innerText = 'Payment successful. Your booking is confirmed.';
-        setTimeout(() => { window.location.href = 'dashboard.html'; }, 1800);
+        showMessage(paymentMessage, 'Payment successful. Your booking is confirmed.', 'success');
+        printReceipt(booking, payment);
+        setTimeout(() => { window.location.href = 'dashboard.html'; }, 2500);
     });
+}
+
+function printReceipt(booking, payment) {
+    const paidAt = new Date(payment.date).toLocaleString();
+    const amount = `LKR ${Number(payment.amount).toLocaleString('en-US')}`;
+    const receiptId = escapeHtml(payment.id);
+    const bookingId = escapeHtml(booking.id);
+    const customerName = escapeHtml(booking.userName);
+    const customerEmail = escapeHtml(booking.userEmail);
+    const packageName = escapeHtml(booking.packageName);
+    const travelDate = escapeHtml(booking.travelDate);
+    const returnDate = escapeHtml(booking.returnDate);
+    const guests = escapeHtml(booking.guests);
+    const status = escapeHtml(payment.status);
+    const receiptHtml = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>Receipt #${receiptId}</title>
+            <style>
+                body {
+                    color: #102033;
+                    font-family: Arial, sans-serif;
+                    margin: 0;
+                    padding: 32px;
+                    background: #f5f8fb;
+                }
+                .receipt {
+                    max-width: 720px;
+                    margin: 0 auto;
+                    background: #fff;
+                    border: 1px solid #dbe5ee;
+                    border-radius: 12px;
+                    padding: 32px;
+                }
+                .header {
+                    border-bottom: 2px solid #0f5e73;
+                    margin-bottom: 24px;
+                    padding-bottom: 16px;
+                }
+                h1, h2, p {
+                    margin: 0;
+                }
+                h1 {
+                    color: #0f5e73;
+                    font-size: 28px;
+                }
+                .muted {
+                    color: #667085;
+                    margin-top: 6px;
+                }
+                .row {
+                    display: flex;
+                    justify-content: space-between;
+                    gap: 24px;
+                    border-bottom: 1px solid #edf2f7;
+                    padding: 12px 0;
+                }
+                .label {
+                    color: #667085;
+                }
+                .value {
+                    font-weight: 700;
+                    text-align: right;
+                }
+                .total {
+                    margin-top: 24px;
+                    border-radius: 10px;
+                    background: #e9f6f5;
+                    padding: 18px;
+                    font-size: 20px;
+                }
+                .footer {
+                    margin-top: 28px;
+                    color: #667085;
+                    font-size: 13px;
+                    text-align: center;
+                }
+                @media print {
+                    body {
+                        background: #fff;
+                        padding: 0;
+                    }
+                    .receipt {
+                        border: none;
+                    }
+                }
+            </style>
+        </head>
+        <body>
+            <div class="receipt">
+                <div class="header">
+                    <h1>GlobeTrek Adventures</h1>
+                    <p class="muted">Payment receipt #${receiptId}</p>
+                </div>
+                <div class="row"><span class="label">Booking ID</span><span class="value">${bookingId}</span></div>
+                <div class="row"><span class="label">Customer</span><span class="value">${customerName}</span></div>
+                <div class="row"><span class="label">Email</span><span class="value">${customerEmail}</span></div>
+                <div class="row"><span class="label">Package</span><span class="value">${packageName}</span></div>
+                <div class="row"><span class="label">Travel dates</span><span class="value">${travelDate} to ${returnDate}</span></div>
+                <div class="row"><span class="label">Guests</span><span class="value">${guests}</span></div>
+                <div class="row"><span class="label">Payment status</span><span class="value">${status}</span></div>
+                <div class="row"><span class="label">Paid on</span><span class="value">${escapeHtml(paidAt)}</span></div>
+                <div class="row total"><span>Total paid</span><span>${amount}</span></div>
+                <p class="footer">Thank you for booking with GlobeTrek Adventures.</p>
+            </div>
+            <script>
+                window.addEventListener('load', function () {
+                    window.print();
+                });
+            <\/script>
+        </body>
+        </html>
+    `;
+
+    const receiptWindow = window.open('', '_blank', 'width=800,height=900');
+    if (!receiptWindow) {
+        showMessage(document.getElementById('paymentMessage'), 'Payment successful. Please allow popups to print the receipt.', 'success');
+        return;
+    }
+
+    receiptWindow.document.open();
+    receiptWindow.document.write(receiptHtml);
+    receiptWindow.document.close();
 }
 
 function initContactPage() {
@@ -602,6 +905,12 @@ function initContactPage() {
     const emailInput = document.getElementById('queryEmail');
     const messageInput = document.getElementById('queryMessage');
     const messageArea = document.getElementById('queryMessageArea');
+    const currentUser = getCurrentUser();
+
+    if (currentUser) {
+        if (nameInput) nameInput.value = currentUser.name;
+        if (emailInput) emailInput.value = currentUser.email;
+    }
 
     form.addEventListener('submit', event => {
         event.preventDefault();
@@ -610,7 +919,17 @@ function initContactPage() {
         const message = messageInput.value.trim();
 
         if (!name || !email || !message) {
-            messageArea.innerText = 'Please complete all fields.';
+            showMessage(messageArea, 'Please complete all fields.');
+            return;
+        }
+
+        if (!isValidEmail(email)) {
+            showMessage(messageArea, 'Please enter a valid email address.');
+            return;
+        }
+
+        if (message.length < 10) {
+            showMessage(messageArea, 'Please enter a message with at least 10 characters.');
             return;
         }
 
@@ -625,9 +944,7 @@ function initContactPage() {
             response: ''
         });
         setStorage('queries', queries);
-        messageArea.classList.remove('text-danger');
-        messageArea.classList.add('text-success');
-        messageArea.innerText = 'Your query has been submitted. We will respond shortly.';
+        showMessage(messageArea, 'Your query has been submitted. We will respond shortly.', 'success');
         form.reset();
     });
 }
@@ -1171,6 +1488,8 @@ function initPackagesPage() {
 }
 
 function initDetailsPage() {
+    if (!document.getElementById('detailTitle')) return;
+
     const params = new URLSearchParams(window.location.search);
     const id = Number(params.get('id'));
     const pkg = findPackage(id);
@@ -1203,10 +1522,47 @@ function initDetailsPage() {
     initDetailsButton();
 }
 
+function initSiteFooter() {
+    if (document.querySelector('.site-footer')) return;
+
+    const year = new Date().getFullYear();
+    const footer = document.createElement('footer');
+    footer.className = 'site-footer';
+    footer.innerHTML = `
+        <div class="container">
+            <div class="site-footer-main">
+                <div>
+                    <a class="site-footer-brand" href="index.html">
+                        <img src="images/logo.png" alt="GlobeTrek Logo">
+                        <span>GlobeTrek Adventures</span>
+                    </a>
+                    <p>Curated travel packages, simple booking, and reliable trip support from planning to return.</p>
+                </div>
+                <nav class="site-footer-links" aria-label="Footer navigation">
+                    <a href="index.html">Home</a>
+                    <a href="packages.html">Packages</a>
+                    <a href="dashboard.html">Dashboard</a>
+                    <a href="contact.html#about-us">About Us</a>
+                    <a href="contact.html">Contact Us</a>
+                    <a href="login.html" data-auth-link>Sign in</a>
+                </nav>
+            </div>
+            <div class="site-footer-bottom">
+                <span>GlobeTrek Adventures</span>
+                <span>&copy; ${year}. All rights reserved.</span>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(footer);
+    initAuthNav();
+}
+
 function initPage() {
     ensureDefaultData();
     normalizeStoredUsers();
     refreshPackageData();
+    initAuthNav();
+    initProtectedBookingLinks();
     initLogoutButtons();
     initRegisterForm();
     initLoginForm();
@@ -1216,11 +1572,12 @@ function initPage() {
     initDashboardPage();
     initPackagesPage();
     initDetailsPage();
+    initSiteFooter();
 }
 
 window.addEventListener('DOMContentLoaded', initPage);
 
-document.addEventListener("DOMContentLoaded", function () {
+document.addEventListener("globetrek-disabled", function () {
 
     const user = getCurrentUser();
     if (!user) return;
@@ -1258,7 +1615,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 });
 
-document.addEventListener("DOMContentLoaded", function () {
+document.addEventListener("globetrek-disabled", function () {
 
     const user = getCurrentUser();
     if (!user) return;
@@ -1295,4 +1652,4 @@ document.addEventListener("DOMContentLoaded", function () {
     // 🔥 THIS LINE IS THE MOST IMPORTANT
     buildDashboardMenu(menuItems);
 
-}); 
+});

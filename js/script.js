@@ -83,9 +83,44 @@ document.addEventListener('DOMContentLoaded', function () {
     ];
 
     const packageContainer = document.getElementById('package-container');
-    if (packageContainer) {
+    const search = document.querySelector('.search-bar');
+    const searchBtn = document.querySelector('.search-btn');
+    const tabs = document.querySelectorAll('.nav-tabs-custom .nav-link');
+    let activeCategory = 'all';
+
+    function getSearchText() {
+        return search ? search.value.trim().toLowerCase() : '';
+    }
+
+    function packageMatchesSearch(pkg, searchText) {
+        if (!searchText) return true;
+        return [pkg.name, pkg.desc, pkg.transport, pkg.duration, pkg.rating, pkg.price]
+            .some(value => String(value).toLowerCase().includes(searchText));
+    }
+
+    function packageMatchesCategory(pkg) {
+        if (activeCategory === 'all') return true;
+        if (!pkg.category) return true;
+        return pkg.category === activeCategory;
+    }
+
+    function renderPackages(packages) {
+        if (!packageContainer) return;
+
         packageContainer.innerHTML = "";
-        travelPackages.forEach(pkg => {
+
+        if (!packages.length) {
+            packageContainer.innerHTML = `
+                <div class="col-12">
+                    <div class="alert alert-info text-center mb-0">
+                        No packages found. Try another destination, transport type, or package name.
+                    </div>
+                </div>
+            `;
+            return;
+        }
+
+        packages.forEach(pkg => {
             packageContainer.innerHTML += `
                 <div class="col-lg-3 col-md-6">
                     <div class="package-card shadow-sm border rounded-3 overflow-hidden bg-white h-100">
@@ -105,6 +140,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 </div>
             `;
         });
+
         document.querySelectorAll('.favorite-icon').forEach(heart => {
             heart.addEventListener('click', function () {
                 this.classList.toggle('fa-solid');
@@ -114,9 +150,38 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // ===== 4. TABS =====
-    const tabs = document.querySelectorAll('.nav-tabs-custom .nav-link');
-    const search = document.querySelector('.search-bar');
+    function filterPackages() {
+        const searchText = getSearchText();
+        const filteredPackages = travelPackages.filter(pkg =>
+            packageMatchesSearch(pkg, searchText) && packageMatchesCategory(pkg)
+        );
+        renderPackages(filteredPackages);
+
+        if (packageContainer && (searchText || activeCategory !== 'all')) {
+            packageContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+    }
+
+    if (packageContainer) {
+        renderPackages(travelPackages);
+    }
+
+    if (searchBtn) {
+        searchBtn.addEventListener('click', filterPackages);
+    }
+
+    if (search) {
+        search.addEventListener('keydown', event => {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                filterPackages();
+            }
+        });
+
+        search.addEventListener('input', () => {
+            if (!search.value.trim()) filterPackages();
+        });
+    }
 
     tabs.forEach(tab => {
         tab.addEventListener('click', function () {
@@ -133,6 +198,7 @@ document.addEventListener('DOMContentLoaded', function () {
             if (icon) icon.classList.replace('fa-square', 'fa-square-check');
 
             const category = this.getAttribute('data-category');
+            activeCategory = category || 'all';
 
             if (search) {
                 search.placeholder =
@@ -140,6 +206,8 @@ document.addEventListener('DOMContentLoaded', function () {
                         ? "Places to go, Hotels..."
                         : `Search for ${category}...`;
             }
+
+            filterPackages();
         });
     });
 
