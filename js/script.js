@@ -88,6 +88,10 @@ document.addEventListener('DOMContentLoaded', function () {
     const tabs = document.querySelectorAll('.nav-tabs-custom .nav-link');
     let activeCategory = 'all';
 
+    function getPackageSource() {
+        return Array.isArray(window.packageData) && window.packageData.length ? window.packageData : travelPackages;
+    }
+
     function getSearchText() {
         return search ? search.value.trim().toLowerCase() : '';
     }
@@ -102,6 +106,10 @@ document.addEventListener('DOMContentLoaded', function () {
         if (activeCategory === 'all') return true;
         if (!pkg.category) return true;
         return pkg.category === activeCategory;
+    }
+
+    function isPackageAvailable(pkg) {
+        return pkg && pkg.available !== false;
     }
 
     function renderPackages(packages) {
@@ -130,10 +138,11 @@ document.addEventListener('DOMContentLoaded', function () {
                                 <h3 class="h5 fw-bold mb-1">${pkg.name}</h3>
                                 <p class="text-warning mb-1">⭐ ${pkg.rating}</p>
                                 <p class="fw-bold text-success mb-2">${pkg.price}</p>
+                                <span class="badge ${isPackageAvailable(pkg) ? 'bg-success' : 'bg-secondary'}">${isPackageAvailable(pkg) ? 'Available' : 'Unavailable'}</span>
                             </div>
                         </a>
                         <div class="p-3 pt-0 d-flex justify-content-between align-items-center">
-                            <button class="btn btn-primary btn-sm rounded-pill" onclick="window.location.href='booking.html?id=${pkg.id}'">Book Now</button>
+                            <button class="btn btn-primary btn-sm rounded-pill" ${isPackageAvailable(pkg) ? '' : 'disabled'} onclick="window.location.href='booking.html?id=${pkg.id}'">${isPackageAvailable(pkg) ? 'Book Now' : 'Unavailable'}</button>
                             <i class="fa-regular fa-heart favorite-icon"></i>
                         </div>
                     </div>
@@ -152,7 +161,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function filterPackages() {
         const searchText = getSearchText();
-        const filteredPackages = travelPackages.filter(pkg =>
+        const filteredPackages = getPackageSource().filter(pkg =>
             packageMatchesSearch(pkg, searchText) && packageMatchesCategory(pkg)
         );
         renderPackages(filteredPackages);
@@ -163,7 +172,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     if (packageContainer) {
-        renderPackages(travelPackages);
+        renderPackages(getPackageSource());
     }
 
     if (searchBtn) {

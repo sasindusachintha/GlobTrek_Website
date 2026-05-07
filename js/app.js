@@ -412,6 +412,17 @@ function findPackage(id) {
     return packages.find(pkg => pkg.id === Number(id)) || defaultPackages.find(pkg => pkg.id === Number(id));
 }
 
+function isPackageAvailable(pkg) {
+    return pkg && pkg.available !== false;
+}
+
+function getBookingStatusClass(status) {
+    if (status === 'Confirmed') return 'bg-success';
+    if (status === 'Cancelled') return 'bg-danger';
+    if (status === 'Paid - Awaiting Staff Confirmation') return 'bg-info';
+    return 'bg-warning';
+}
+
 function findUser(email) {
     return getStorage('users').find(user => user.email.toLowerCase() === email.toLowerCase());
 }
@@ -585,6 +596,10 @@ function initBookingPage() {
         if (packageTransport) packageTransport.innerText = pkg.transport;
         if (packagePrice) packagePrice.innerText = pkg.price;
         if (packageDescription) packageDescription.innerText = pkg.desc;
+        if (!isPackageAvailable(pkg)) {
+            showMessage(messageArea, 'This package is currently unavailable. Please choose another package.', 'warning');
+            form.querySelector('button[type="submit"]')?.setAttribute('disabled', 'disabled');
+        }
     }
 
     const currentUser = getCurrentUser();
@@ -612,6 +627,11 @@ function initBookingPage() {
 
         if (!pkg) {
             showMessage(messageArea, 'Please select a valid package first.');
+            return;
+        }
+
+        if (!isPackageAvailable(pkg)) {
+            showMessage(messageArea, 'This package is currently unavailable. Please choose another package.', 'warning');
             return;
         }
 
@@ -765,10 +785,10 @@ function initPaymentPage() {
         payments.push(payment);
         setStorage('payments', payments);
 
-        const updatedBookings = bookings.map(b => b.id === booking.id ? { ...b, status: 'Confirmed' } : b);
+        const updatedBookings = bookings.map(b => b.id === booking.id ? { ...b, status: 'Paid - Awaiting Staff Confirmation' } : b);
         setStorage('bookings', updatedBookings);
 
-        showMessage(paymentMessage, 'Payment successful. Your booking is confirmed.', 'success');
+        showMessage(paymentMessage, 'Payment successful. Staff will manually confirm your booking soon.', 'success');
         printReceipt(booking, payment);
         setTimeout(() => { window.location.href = 'dashboard.html'; }, 2500);
     });
@@ -876,7 +896,7 @@ function printReceipt(booking, payment) {
                 <div class="row"><span class="label">Payment status</span><span class="value">${status}</span></div>
                 <div class="row"><span class="label">Paid on</span><span class="value">${escapeHtml(paidAt)}</span></div>
                 <div class="row total"><span>Total paid</span><span>${amount}</span></div>
-                <p class="footer">Thank you for booking with GlobeTrek Adventures.</p>
+                <p class="footer">Thank you for booking with GlobeTrek Adventures. Staff will confirm your trip after reviewing availability.</p>
             </div>
             <script>
                 window.addEventListener('load', function () {
@@ -1092,7 +1112,7 @@ function loadDashboardSection(section) {
                     <td>${booking.packageName}</td>
                     <td>${booking.travelDate} - ${booking.returnDate}</td>
                     <td>${booking.guests}</td>
-                    <td><span class="badge ${booking.status === 'Confirmed' ? 'bg-success' : 'bg-warning'}">${booking.status}</span></td>
+                    <td><span class="badge ${getBookingStatusClass(booking.status)}">${booking.status}</span></td>
                     <td><button class="btn btn-sm btn-outline-danger cancel-booking" data-id="${booking.id}">Cancel</button></td>
                 </tr>`), ['Package', 'Travel Date', 'Guests', 'Status', 'Action']) : '<p>No bookings found. <a href="packages.html">Browse packages</a></p>'}`;
             document.querySelectorAll('.cancel-booking').forEach(button => {
@@ -1165,8 +1185,9 @@ function loadDashboardSection(section) {
                         <td>${pkg.name}</td>
                         <td>${pkg.duration}</td>
                         <td>${pkg.price}</td>
+                        <td><span class="badge ${isPackageAvailable(pkg) ? 'bg-success' : 'bg-secondary'}">${isPackageAvailable(pkg) ? 'Available' : 'Unavailable'}</span></td>
                         <td><button class="btn btn-sm btn-outline-primary edit-package" data-id="${pkg.id}">Edit</button></td>
-                    </tr>`), ['Name', 'Duration', 'Price', 'Action'])}`;
+                    </tr>`), ['Name', 'Duration', 'Price', 'Availability', 'Action'])}`;
             document.querySelectorAll('.edit-package').forEach(button => {
                 button.addEventListener('click', () => {
                     const pkgId = Number(button.dataset.id);
@@ -1178,6 +1199,10 @@ function loadDashboardSection(section) {
                             <div class="mb-3"><label class="form-label">Price</label><input class="form-control" id="packagePriceEdit" value="${pkg.price}"></div>
                             <div class="mb-3"><label class="form-label">Duration</label><input class="form-control" id="packageDurationEdit" value="${pkg.duration}"></div>
                             <div class="mb-3"><label class="form-label">Description</label><textarea class="form-control" id="packageDescEdit" rows="4">${pkg.desc}</textarea></div>
+                            <div class="form-check form-switch mb-3">
+                                <input class="form-check-input" type="checkbox" id="packageAvailableEdit" ${isPackageAvailable(pkg) ? 'checked' : ''}>
+                                <label class="form-check-label" for="packageAvailableEdit">Available for booking</label>
+                            </div>
                             <button class="btn btn-primary" type="submit">Save Changes</button>
                         </form>
                         <button class="btn btn-link mt-3" id="cancelEdit">Back to list</button>
@@ -1191,7 +1216,8 @@ function loadDashboardSection(section) {
                             name: document.getElementById('packageNameEdit').value.trim(),
                             price: document.getElementById('packagePriceEdit').value.trim(),
                             duration: document.getElementById('packageDurationEdit').value.trim(),
-                            desc: document.getElementById('packageDescEdit').value.trim()
+                            desc: document.getElementById('packageDescEdit').value.trim(),
+                            available: document.getElementById('packageAvailableEdit').checked
                         };
                         setStorage('packages', packages);
                         refreshPackageData();
@@ -1207,8 +1233,8 @@ function loadDashboardSection(section) {
                         <td>${booking.packageName}</td>
                         <td>${booking.userName}</td>
                         <td>${booking.travelDate}</td>
-                        <td><span class="badge ${booking.status === 'Confirmed' ? 'bg-success' : 'bg-warning'}">${booking.status}</span></td>
-                        <td><button class="btn btn-sm btn-outline-success confirm-booking" data-id="${booking.id}" ${booking.status === 'Confirmed' ? 'disabled' : ''}>Confirm</button></td>
+                        <td><span class="badge ${getBookingStatusClass(booking.status)}">${booking.status}</span></td>
+                        <td><button class="btn btn-sm btn-outline-success confirm-booking" data-id="${booking.id}" ${['Confirmed', 'Cancelled'].includes(booking.status) ? 'disabled' : ''}>Confirm</button></td>
                     </tr>`), ['Package', 'Customer', 'Travel Date', 'Status', 'Action'])}`;
             document.querySelectorAll('.confirm-booking').forEach(button => {
                 button.addEventListener('click', () => {
@@ -1449,6 +1475,12 @@ function initDetailsButton() {
     if (!bookButton) return;
     const params = new URLSearchParams(window.location.search);
     const packageId = params.get('id');
+    const pkg = findPackage(packageId);
+    if (pkg && !isPackageAvailable(pkg)) {
+        bookButton.disabled = true;
+        bookButton.innerText = 'Unavailable';
+        return;
+    }
     bookButton.addEventListener('click', () => {
         window.location.href = `booking.html?id=${packageId}`;
     });
@@ -1469,10 +1501,11 @@ function initPackagesPage() {
                             <h3 class="h5 fw-bold mb-1">${pkg.name}</h3>
                             <p class="text-warning mb-1">⭐ ${pkg.rating}</p>
                             <p class="fw-bold text-success mb-2">${pkg.price}</p>
+                            <span class="badge ${isPackageAvailable(pkg) ? 'bg-success' : 'bg-secondary'}">${isPackageAvailable(pkg) ? 'Available' : 'Unavailable'}</span>
                         </div>
                     </a>
                     <div class="p-3 pt-0 d-flex justify-content-between align-items-center">
-                        <button class="btn btn-primary btn-sm rounded-pill" onclick="window.location.href='booking.html?id=${pkg.id}'">Book Now</button>
+                        <button class="btn btn-primary btn-sm rounded-pill" ${isPackageAvailable(pkg) ? '' : 'disabled'} onclick="window.location.href='booking.html?id=${pkg.id}'">${isPackageAvailable(pkg) ? 'Book Now' : 'Unavailable'}</button>
                         <i class="fa-regular fa-heart favorite-icon"></i>
                     </div>
                 </div>
