@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Package Details | GlobeTrek</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .gallery-main {
+            width: 100%;
+            height: 420px;
+            object-fit: cover;
+            border-radius: 16px;
+        }
+
+        .gallery-side {
+            width: 100%;
+            height: 145px;
+            object-fit: cover;
+            border-radius: 16px;
+        }
+
+        .details-box,
+        .price-card,
+        .info-card,
+        .package-header {
+            border-radius: 20px;
+            box-shadow: 0 18px 40px rgba(52, 38, 97, 0.08);
+            background: #fff;
+        }
+
+        .details-box,
+        .info-card {
+            border: 1px solid #eef1f6;
+        }
+
+        .package-header {
+            padding: 32px;
+            border: 1px solid #eef1f6;
+        }
+
+        .detail-stats .badge {
+            border: 1px solid #e9e9f2;
+            color: #494a5f;
+            background: #f8f8ff;
+            font-size: 0.95rem;
+            border-radius: 50px;
+            padding: 0.8rem 1rem;
+        }
+
+        .price-card {
+            padding: 30px;
+            transition: transform 0.3s ease;
+        }
+
+        .price-card:hover {
+            transform: translateY(-4px);
+        }
+
+        .price-card h2 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .price-card p {
+            color: #6c6d80;
+        }
+
+        .action-btns .btn,
+        .price-card .btn {
+            border-radius: 999px;
+            padding: 14px 28px;
+            font-weight: 600;
+        }
+
+        .info-card {
+            padding: 32px;
+        }
+
+        .info-card h4 {
+            font-weight: 700;
+            letter-spacing: 0.02em;
+            margin-bottom: 1.25rem;
+        }
+
+        .info-list {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .info-list li,
+        .note-item,
+        .list-group-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            margin-bottom: 0.9rem;
+            color: #4f5167;
+            font-size: 0.98rem;
+        }
+
+        .note-item {
+            font-weight: 500;
+        }
+
+        .list-group-item {
+            border: none;
+            padding-left: 0;
+            background: transparent;
+        }
+
+        .list-group-item i,
+        .info-list li i,
+        .note-item i {
+            color: #3ab47d;
+            margin-top: 3px;
+        }
+
+        .itinerary-step h6 {
+            margin-bottom: 0.35rem;
+            font-weight: 700;
+        }
+
+        .itinerary-step p {
+            color: #6c6d80;
+            margin-bottom: 0;
+        }
+
+        .badge-pill {
+            border-radius: 999px;
+            padding: 0.55rem 0.9rem;
+            font-size: 0.9rem;
+            color: #171732;
+            background: #f6f2ff;
+            border: 1px solid #ece7ff;
+        }
+
+        .text-primary-strong {
+            color: #4538b7;
+        }
+
+        .package-header .badge {
+            background: #e8efff;
+            color: #3f4db9;
+        }
+
+        .price-note {
+            color: #898b9c;
+            font-size: 0.95rem;
+        }
+
+        .btn-outline-dark:hover {
+            background-color: #34e0a1;
+            border-color: #34e0a1;
+            color: black;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container mt-5 mb-5">
+        <div class="package-header mb-5">
+            <div class="row align-items-center">
+                <div class="col-lg-8">
+                    <span class="badge bg-primary mb-3">Best Seller</span>
+                    <h1 id="detailTitle" class="fw-bold display-5 mb-3">PACKAGE TITLE</h1>
+                    <p id="detailDesc" class="text-muted fs-5 mb-4">Description goes here...</p>
+                    <div class="d-flex flex-wrap gap-3 detail-stats">
+                        <span class="badge-pill">Duration: <span id="detailDuration">4 Days</span></span>
+                        <span class="badge-pill">Transport: <span id="detailTransport">Luxury Bus</span></span>
+                        <span class="badge-pill">Rating: <span id="detailRating">4.8</span></span>
+                    </div>
+                </div>
+                <div class="col-lg-4 text-lg-end mt-4 mt-lg-0">
+                    <div class="price-card">
+                        <p class="text-muted mb-1">Starting From</p>
+                        <h2 id="detailPrice" class="fw-bold mb-3 text-primary-strong">LKR 12,000</h2>
+                        <p class="price-note mb-4">Per person · All taxes included · Free cancellation</p>
+                        <button id="bookNowBtn" class="btn btn-dark btn-lg w-100 mb-3">Book Now</button>
+                        <button class="btn btn-outline-dark w-100"><i class="fa-regular fa-heart me-2"></i>Add to Wishlist</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-4 mb-5">
+            <div class="col-lg-8">
+                <div class="gallery-grid row g-3">
+                    <div class="col-12">
+                        <img id="mainImg" class="gallery-main" alt="Main Image">
+                    </div>
+                    <div class="col-4"><img id="img1" class="gallery-side" alt="Image 1"></div>
+                    <div class="col-4"><img id="img2" class="gallery-side" alt="Image 2"></div>
+                    <div class="col-4"><img id="img3" class="gallery-side" alt="Image 3"></div>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="details-box p-4">
+                    <h3 class="mb-3">Package Highlights</h3>
+                    <div id="packageSpecs" class="mb-4"></div>
+                    <h5 class="mb-3">Why travelers love it</h5>
+                    <ul id="packageHighlights" class="list-group list-group-flush"></ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-4 mb-5">
+            <div class="col-lg-7">
+                <div class="info-card mb-4">
+                    <h4>Itinerary Snapshot</h4>
+                    <div id="itineraryList"></div>
+                </div>
+                <div class="info-card">
+                    <h4>What’s Included</h4>
+                    <ul id="includedList" class="info-list"></ul>
+                </div>
+            </div>
+            <div class="col-lg-5">
+                <div class="info-card">
+                    <h4>Travel Notes</h4>
+                    <p class="text-muted">This carefully curated itinerary is built for comfort, local discovery, and memorable moments. Enjoy premium lodging, guided tours, and stress-free transfers from arrival to departure.</p>
+                    <div class="d-flex flex-column gap-3 mt-4">
+                        <div class="note-item"><i class="fa-solid fa-check"></i>Flexible booking options</div>
+                        <div class="note-item"><i class="fa-solid fa-check"></i>Expert local guides included</div>
+                        <div class="note-item"><i class="fa-solid fa-check"></i>24/7 traveler support</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/details.js"></script>
+</body>
+

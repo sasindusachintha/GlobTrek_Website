@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GlobeTrek Adventures | Travel Starts Here</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg bg-white sticky-top">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="index.html">
+                <img src="images/logo.png" alt="GlobeTrek Logo" class="me-2 logo">
+                GlobeTrek Adventures
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+                <ul class="navbar-nav">
+                    <a class="nav-link active" href="index.html">Home</a>
+                    <li class="nav-item"><a class="nav-link" href="packages.html">Packages</a></li>
+                    <li class="nav-item"><a class="nav-link" href="dashboard.html">Dashboard</a></li>
+                    <li class="nav-item"><a class="nav-link" href="contact.html">About Us</a></li>
+                    <li class="nav-item"><a class="nav-link" href="login.html">Sign in</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="container text-center hero-section">
+        <h1 class="hero-title">Travel Starts Here</h1>
+
+        <!-- Category Tabs -->
+        <!-- Category Tabs -->
+        <ul class="nav nav-tabs-custom" id="categoryTabs">
+
+            <li class="nav-item">
+                <button class="nav-link active" data-category="all">
+                    <i class="fa-solid fa-layer-group"></i> <span>Search All</span>
+                </button>
+            </li>
+
+            <li class="nav-item">
+                <button class="nav-link" data-category="hotels">
+                    <i class="fa-solid fa-hotel"></i> <span>Hotels</span>
+                </button>
+            </li>
+
+            <li class="nav-item">
+                <button class="nav-link" data-category="restaurants">
+                    <i class="fa-solid fa-utensils"></i> <span>Restaurants</span>
+                </button>
+            </li>
+
+        </ul>
+
+        <!-- Search Bar -->
+        <div class="search-wrapper">
+            <i class="fa-solid fa-magnifying-glass search-icon"></i>
+
+            <input type="text" class="search-bar" placeholder="Places to go, Hotels...">
+
+            <button class="search-btn">
+                Search
+            </button>
+        </div>
+
+        <!-- Image Box -->
+        <div class="hero-image-container">
+            <img id="heroImage" src="images/hero1.jpg" alt="Travel Image">
+        </div>
+    </main>
+
+    <div class="category-sticky-wrapper">
+        <div class="container">
+            <ul class="nav nav-tabs-custom" id="categoryTabs">
+                <li class="nav-item">
+                    <button class="nav-link active" data-category="all">
+                        <i class="fa-regular fa-square-check"></i> Search All
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-link" data-category="hotels">
+                        <i class="fa-regular fa-square"></i> Hotels
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-link" data-category="restaurants">
+                        <i class="fa-regular fa-square"></i> Restaurants
+                    </button>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- package cards  -->
+    <section class="container mt-5 pt-4">
+        <h2 class="section-title text-start mb-4">Explore experiences</h2>
+        <div class="row g-4" id="package-container"></div>
+    </section>
+
+    <section class="about-us-section bg-light">
+        <div class="container">
+            <div class="row g-4 align-items-center about-us-card mx-auto">
+                <div class="col-lg-6 about-image">
+                    <div>Our location &amp; culture</div>
+                </div>
+                <div class="col-lg-6 about-content">
+                    <h3>About Us</h3>
+                    <p>GlobeTrek Adventures brings curated travel experiences to life. We combine local expertise, premium service, and seamless planning so every journey becomes unforgettable.</p>
+                    <p>From luxury escapes to cultural city breaks, our team tailors each itinerary to your interests, comfort, and budget. Enjoy trusted accommodations, expert guides, and round-the-clock support while you travel.</p>
+                    <p>We believe travel should feel effortless and inspiring. Let GlobeTrek guide your next adventure with clarity, confidence, and a touch of luxury.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Bootstrap 5 JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Custom JS -->
+    <script src="js/script.js"></script>
+</body>
+
+</html>
