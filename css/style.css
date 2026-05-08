@@ -610,11 +610,13 @@ section.container {
     transition: all 0.2s ease;
     background: transparent;
     color: #444;
+    padding: 1rem 1.2rem;
+    border-radius: 16px;
 }
 
 #dashboardMenu .list-group-item:hover {
     background-color: #f8f9fa;
-    padding-left: 30px; /* Slight slide effect */
+    padding-left: 35px; /* Slight slide effect */
 }
 
 #dashboardMenu .list-group-item.active {
@@ -622,6 +624,13 @@ section.container {
     color: #0d6efd; /* Bootstrap Blue */
     border-left: 5px solid #0d6efd !important;
     font-weight: 700;
+    box-shadow: inset 4px 0 0 #0d6efd;
+}
+
+#dashboardContent h4 {
+    font-size: 1.5rem;
+    letter-spacing: -0.02em;
+    margin-bottom: 1.2rem;
 }
 
 #dashboardContent {
@@ -820,10 +829,56 @@ a:hover {
     border-left-color: var(--gt-teal) !important;
 }
 
-.table thead th {
+.dashboard-table-wrapper {
+    margin-top: 1.25rem;
+}
+
+.dashboard-table {
+    min-width: 100%;
+    border-collapse: separate;
+    border-spacing: 0 0.85rem;
+}
+
+.dashboard-table thead th {
     color: var(--gt-muted);
-    font-size: 0.85rem;
+    font-size: 0.82rem;
     text-transform: uppercase;
+    letter-spacing: 0.1em;
+    padding: 1rem 1rem 0.75rem;
+    border-bottom: 1px solid rgba(16, 32, 51, 0.08);
+}
+
+.dashboard-table tbody tr {
+    background: #ffffff;
+    border: 1px solid rgba(16, 32, 51, 0.06);
+    border-radius: 16px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.dashboard-table tbody tr:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 14px 32px rgba(16, 32, 51, 0.08);
+}
+
+.dashboard-table td,
+.dashboard-table th {
+    padding: 1rem 1rem;
+    vertical-align: middle;
+}
+
+.dashboard-table tbody tr td:first-child {
+    font-weight: 600;
+    color: #1f3446;
+}
+
+.dashboard-table tbody tr td:last-child {
+    color: var(--gt-muted);
+}
+
+#dashboardContent {
+    background-color: #fff;
+    padding: 2rem;
+    min-height: 540px;
 }
 
 .site-footer {

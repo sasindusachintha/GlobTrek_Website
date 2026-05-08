@@ -1,4 +1,4 @@
-// ===== STORAGE HELPERS =====
+﻿// ===== STORAGE HELPERS =====
 function getStorage(key) {
     return JSON.parse(localStorage.getItem(key)) || [];
 }
@@ -1015,8 +1015,8 @@ function buildDashboardMenu(items) {
 
 function renderTable(rows, headers) {
     return `
-        <div class="table-responsive">
-            <table class="table table-borderless align-middle">
+        <div class="table-responsive dashboard-table-wrapper">
+            <table class="table table-borderless table-hover align-middle dashboard-table">
                 <thead>
                     <tr>${headers.map(header => `<th>${header}</th>`).join('')}</tr>
                 </thead>
