@@ -62,205 +62,219 @@ const defaultUsers = [
     { id: 3, name: 'Customer User', email: 'user@globetrek.com', password: 'User123', role: 'user', approved: true }
 ];
 
+const PACKAGE_DATA_VERSION = 'sri-lanka-locations-2026-05-08';
+
 const defaultPackages = [
     {
         id: 0,
-        name: 'Santorini Breeze',
+        name: 'Sigiriya Rock Fortress',
         price: 'LKR 12,000',
-        desc: 'Discover the breathtaking blue waters and iconic white architecture of Greece.',
-        transport: 'Ferry & Luxury Bus',
-        duration: '3 Days, 2 Nights',
+        desc: 'Explore the Lion Rock fortress, frescoes, gardens, and sweeping views over Sri Lanka cultural triangle.',
+        transport: 'Air-conditioned van',
+        duration: '1 Day',
         rating: '4.8 (120 reviews)',
-        accommodation: 'Luxury waterfront villa',
-        transportation: 'Private transfers and local bus trips',
-        guide: 'English-speaking island guide',
+        location: 'Sigiriya, Central Province, Sri Lanka',
+        category: 'attractions',
+        accommodation: 'Day tour package',
+        transportation: 'Hotel pickup and return transfer',
+        guide: 'Licensed cultural site guide',
         images: [
             'images/package1_2.jpg',
-            'images/package1.webp',
-            'images/package1_3.webp',
+            'images/package1.jpg',
+            'images/package1_3.jpg',
             'images/package1_4.webp'
         ],
-        highlights: ['Sunset cruise along the caldera', 'Private guided island tour', 'Luxury waterfront villa stay', 'Authentic Greek dining experience'],
+        highlights: ['Guided climb to Sigiriya summit', 'Lion Gate and mirror wall visit', 'Royal garden walk', 'Photo stops around the fortress'],
         itinerary: [
-            { day: 'Day 1', activity: 'Arrival and welcome reception at the hotel.' },
-            { day: 'Day 2', activity: 'Explore Oia, the caldera villages, and sunset view.' },
-            { day: 'Day 3', activity: 'Ferry excursion and leisure beach time.' }
+            { day: 'Morning', activity: 'Pickup and drive to Sigiriya with a short refreshment stop.' },
+            { day: 'Midday', activity: 'Climb Sigiriya Rock Fortress with a local guide.' },
+            { day: 'Afternoon', activity: 'Visit the water gardens and return after lunch.' }
         ],
-        included: ['3-night hotel accommodation', 'Daily breakfast and dinner', 'Airport transfers', 'Guided sightseeing tour']
+        included: ['Hotel pickup and drop-off', 'Site guide support', 'Bottled water', 'Trip coordination']
     },
     {
         id: 1,
-        name: 'Bali Retreat',
+        name: 'Nuwara Eliya Tea Country',
         price: 'LKR 15,000',
-        desc: 'Relax in the tropical paradise of Bali with villas and temples.',
-        transport: 'Private Van',
-        duration: '5 Days, 4 Nights',
+        desc: 'Enjoy cool hill-country weather, tea estates, waterfalls, Gregory Lake, and colonial charm in Nuwara Eliya.',
+        transport: 'Private van',
+        duration: '2 Days, 1 Night',
         rating: '4.9 (250 reviews)',
-        accommodation: 'Private villa with pool',
+        location: 'Nuwara Eliya, Central Province, Sri Lanka',
+        category: 'attractions',
+        accommodation: 'Comfort hill-country hotel',
         transportation: 'Private van transfers',
-        guide: 'Local cultural guide',
+        guide: 'Hill-country travel guide',
         images: [
-            'images/package2.jpg',
-            'images/package2_2.jpeg',
+            'images/package2.webp',
+            'images/package2_2.webp',
             'images/package2_3.webp',
             'images/package2_4.jpg'
         ],
-        highlights: ['Secluded villa stay', 'Morning yoga session', 'Cultural temple visit', 'Sunset beach dinner'],
+        highlights: ['Tea factory and estate visit', 'Gregory Lake leisure time', 'Waterfall viewpoints', 'Cool-climate hotel stay'],
         itinerary: [
-            { day: 'Day 1', activity: 'Arrival in Ubud and village walk.' },
-            { day: 'Day 2', activity: 'Visit Tirta Empul temple and rice terraces.' },
-            { day: 'Day 3', activity: 'Beach day in Seminyak with sunset dinner.' }
+            { day: 'Day 1', activity: 'Travel through the hills, visit a tea estate, and check in near Nuwara Eliya.' },
+            { day: 'Day 2', activity: 'Explore Gregory Lake, town highlights, and scenic viewpoints before returning.' }
         ],
-        included: ['4-night villa stay', 'Breakfast daily', 'Transfers and driver services', 'Temple entrance fees']
+        included: ['1-night hotel stay', 'Breakfast', 'Private transfers', 'Tea factory visit arrangement']
     },
     {
         id: 2,
-        name: 'Parisian Night',
+        name: 'Galle Fort Heritage Walk',
         price: 'LKR 10,000',
-        desc: 'Enjoy the romance of Paris with Eiffel Tower dinner.',
-        transport: 'Metro & Walking Tour',
-        duration: '2 Days, 1 Night',
+        desc: 'Discover Galle Fort lanes, Dutch-era buildings, lighthouse views, museums, cafes, and southern coastal scenery.',
+        transport: 'Coastal coach',
+        duration: '1 Day',
         rating: '4.7 (95 reviews)',
-        accommodation: 'Boutique city hotel',
-        transportation: 'Metro city pass',
-        guide: 'Paris city guide',
+        location: 'Galle Fort, Southern Province, Sri Lanka',
+        category: 'attractions',
+        accommodation: 'Day tour package',
+        transportation: 'Coastal coach or private van',
+        guide: 'Heritage walking guide',
         images: [
             'images/package3.jpg',
-            'images/package3_2.jpg',
-            'images/package3_3.jpeg',
-            'images/package3.jpg'
+            'images/package3_2.jpeg',
+            'images/package3_3.webp',
+            'images/package3_4.jpg'
         ],
-        highlights: ['Eiffel Tower dinner', 'Seine river cruise', 'Champs-Élysées tour', 'Boutique hotel stay'],
+        highlights: ['Guided Galle Fort walk', 'Lighthouse and rampart views', 'Dutch Hospital precinct', 'Cafe and boutique stops'],
         itinerary: [
-            { day: 'Day 1', activity: 'Arrival and Latin Quarter stroll.' },
-            { day: 'Day 2', activity: 'City tour and evening dinner by the tower.' }
+            { day: 'Morning', activity: 'Depart for Galle along the southern expressway.' },
+            { day: 'Midday', activity: 'Walk the fort streets, lighthouse area, and old ramparts.' },
+            { day: 'Afternoon', activity: 'Free time for cafes and shopping before return transfer.' }
         ],
-        included: ['Hotel accommodation', 'Eiffel Tower dinner', 'Metro sightseeing pass', 'Seine cruise']
+        included: ['Return transport', 'Guided heritage walk', 'Parking and coordination', 'Bottled water']
     },
     {
         id: 3,
-        name: 'Tokyo Explorer',
+        name: 'Waters Edge Hotel Stay',
         price: 'LKR 18,000',
-        desc: 'Explore Tokyo’s modern and traditional attractions.',
-        transport: 'Bullet Train',
-        duration: '4 Days, 3 Nights',
+        desc: 'Relax at Waters Edge in Battaramulla with lakeside views, premium dining, pool time, and an easy city escape.',
+        transport: 'Private car',
+        duration: '2 Days, 1 Night',
         rating: '4.6 (180 reviews)',
-        accommodation: 'City hotel',
-        transportation: 'Bullet train tickets',
-        guide: 'Tokyo cultural guide',
+        location: 'Battaramulla, Colombo, Sri Lanka',
+        category: 'hotels',
+        accommodation: 'Waters Edge Hotel',
+        transportation: 'Private city transfer',
+        guide: 'Guest relations support',
         images: [
             'images/package4.webp',
-            'images/package4.webp',
-            'images/package4.webp',
-            'images/package4.webp'
+            'images/package4_1.jpg',
+            'images/package4_2.jpeg',
+            'images/package4_3.jpg'
         ],
-        highlights: ['Bullet train experience', 'Shibuya and Harajuku tour', 'Tea ceremony', 'Night street food adventure'],
+        highlights: ['Lakeside hotel stay', 'Breakfast dining experience', 'Pool and leisure time', 'Colombo city access'],
         itinerary: [
-            { day: 'Day 1', activity: 'Arrival and Shinjuku exploration.' },
-            { day: 'Day 2', activity: 'Asakusa temples and city tour.' },
-            { day: 'Day 3', activity: 'Full-day Tokyo highlight tour.' }
+            { day: 'Day 1', activity: 'Check in at Waters Edge and enjoy an evening by the lake.' },
+            { day: 'Day 2', activity: 'Breakfast, leisure time, and checkout with return transfer.' }
         ],
-        included: ['City hotel stay', 'Daily breakfast', 'Train transfers', 'Cultural activities']
+        included: ['1-night accommodation', 'Breakfast', 'Private transfer', 'Booking support']
     },
     {
         id: 4,
-        name: 'Swiss Alps',
+        name: 'Cinnamon Lakeside Colombo Restaurant',
         price: 'LKR 20,000',
-        desc: 'Mountain adventure with skiing and scenic views.',
-        transport: 'Cable Car',
-        duration: '6 Days, 5 Nights',
+        desc: 'Enjoy a refined dining experience at Cinnamon Lakeside Colombo with lake views and a curated meal package.',
+        transport: 'Private car',
+        duration: 'Evening dining',
         rating: '4.9 (310 reviews)',
-        accommodation: 'Alpine chalet',
-        transportation: 'Cable car pass',
-        guide: 'Alpine mountain guide',
+        location: 'Colombo 02, Western Province, Sri Lanka',
+        category: 'restaurants',
+        accommodation: 'Restaurant reservation package',
+        transportation: 'Optional Colombo transfer',
+        guide: 'Dining reservation support',
         images: [
-            'images/package5.jpeg',
-            'images/package5.jpeg',
-            'images/package5.jpeg',
-            'images/package5.jpeg'
+            'images/package5.jpg',
+            'images/package5_1.jpg',
+            'images/package5_2.jpg',
+            'images/package5_3.jpg'
         ],
-        highlights: ['Alpine views', 'Cable car ride', 'Chalet dining', 'Village tour'],
+        highlights: ['Cinnamon Lakeside dining', 'Lake-view ambience', 'Curated meal reservation', 'Special occasion setup support'],
         itinerary: [
-            { day: 'Day 1', activity: 'Arrival and lodge check-in.' },
-            { day: 'Day 2', activity: 'Cable car and mountain walk.' },
-            { day: 'Day 3', activity: 'Optional ski or spa day.' }
+            { day: 'Evening', activity: 'Arrive at Cinnamon Lakeside Colombo for reserved dining.' },
+            { day: 'After Dinner', activity: 'Optional lakeside photo time and return transfer.' }
         ],
-        included: ['Chalet stay', 'Breakfast and dinner', 'Cable car pass', 'Guided mountain walk']
+        included: ['Restaurant reservation', 'Meal package coordination', 'Optional transfer planning', 'Customer support']
     },
     {
         id: 5,
-        name: 'Dubai Safari',
+        name: 'Jetwing Blue Negombo Hotel',
         price: 'LKR 14,000',
-        desc: 'Desert safari with luxury experience.',
-        transport: '4x4 Jeep',
-        duration: '3 Days, 2 Nights',
+        desc: 'Stay by Negombo beach at Jetwing Blue with ocean views, seafood dining, pool access, and airport convenience.',
+        transport: 'Private car',
+        duration: '2 Days, 1 Night',
         rating: '4.5 (150 reviews)',
-        accommodation: 'Desert camp',
-        transportation: '4x4 transfers',
-        guide: 'Safari guide',
+        location: 'Negombo, Western Province, Sri Lanka',
+        category: 'hotels',
+        accommodation: 'Jetwing Blue Negombo',
+        transportation: 'Private airport or city transfer',
+        guide: 'Hotel booking support',
         images: [
-            'images/package6.webp',
-            'images/package6.webp',
-            'images/package6.webp',
-            'images/package6.webp'
+            'images/package6.jpg',
+            'images/package6_1.jpg',
+            'images/package6_2.jpg',
+            'images/package6_3.jpg'
         ],
-        highlights: ['Desert dune drive', 'Camp dinner', 'Sunset views', 'Entertainment show'],
+        highlights: ['Beachfront hotel stay', 'Negombo beach access', 'Pool and seafood dining', 'Close to Bandaranaike Airport'],
         itinerary: [
-            { day: 'Day 1', activity: 'Arrival and city highlights.' },
-            { day: 'Day 2', activity: 'Morning rest and evening safari.' },
-            { day: 'Day 3', activity: 'Departure after breakfast.' }
+            { day: 'Day 1', activity: 'Check in at Jetwing Blue and enjoy the beach or pool.' },
+            { day: 'Day 2', activity: 'Breakfast, relaxed morning, and checkout transfer.' }
         ],
-        included: ['2-night hotel stay', 'Desert safari experience', 'Dinner under the stars', 'Transfers and guide service']
+        included: ['1-night hotel stay', 'Breakfast', 'Private transfer assistance', 'Booking coordination']
     },
     {
         id: 6,
-        name: 'London Classic',
+        name: 'Ambuluwawa Tower Adventure',
         price: 'LKR 14,000',
-        desc: 'Historic tour of London landmarks.',
-        transport: 'Bus',
-        duration: '3 Days, 2 Nights',
+        desc: 'Visit Ambuluwawa Tower near Gampola for spiral tower views, mountain scenery, and an adventurous day trip.',
+        transport: 'Private van',
+        duration: '1 Day',
         rating: '4.4 (200 reviews)',
-        accommodation: 'City hotel',
-        transportation: 'Luxury coach',
-        guide: 'Historical city guide',
+        location: 'Gampola, Central Province, Sri Lanka',
+        category: 'attractions',
+        accommodation: 'Day tour package',
+        transportation: 'Private van transfer',
+        guide: 'Adventure tour guide',
         images: [
-            'images/package7.webp',
-            'images/package7.webp',
-            'images/package7.webp',
-            'images/package7.webp'
+            'images/package7.jpg',
+            'images/package7_1.webp',
+            'images/package7_2.jpg',
+            'images/package7_3.webp'
         ],
-        highlights: ['Classic city landmarks', 'River Thames cruise', 'Royal palace tour', 'Historic walking route'],
+        highlights: ['Ambuluwawa tower climb', 'Mountain viewpoint stops', 'Gampola scenic drive', 'Photo-friendly itinerary'],
         itinerary: [
-            { day: 'Day 1', activity: 'Arrival and Westminster tour.' },
-            { day: 'Day 2', activity: 'City highlights and river cruise.' },
-            { day: 'Day 3', activity: 'Departure after breakfast.' }
+            { day: 'Morning', activity: 'Pickup and drive toward Gampola through hill-country roads.' },
+            { day: 'Midday', activity: 'Visit Ambuluwawa Tower and surrounding viewpoints.' },
+            { day: 'Afternoon', activity: 'Lunch stop and return transfer.' }
         ],
-        included: ['City hotel stay', 'Daily breakfast', 'Guided city tour', 'Thames river cruise']
+        included: ['Return transport', 'Guide support', 'Bottled water', 'Trip coordination']
     },
     {
         id: 7,
-        name: 'Maldives Blue',
+        name: 'Anuradhapura Historical Places',
         price: 'LKR 14,000',
-        desc: 'Luxury island experience with clear waters.',
-        transport: 'Speedboat',
-        duration: '4 Days, 3 Nights',
+        desc: 'Explore ancient Anuradhapura, sacred stupas, ruins, the Sri Maha Bodhi, and landmark heritage sites.',
+        transport: 'Air-conditioned van',
+        duration: '2 Days, 1 Night',
         rating: '5.0 (80 reviews)',
-        accommodation: 'Beachfront resort',
-        transportation: 'Speedboat transfer',
-        guide: 'Island concierge service',
+        location: 'Anuradhapura, North Central Province, Sri Lanka',
+        category: 'attractions',
+        accommodation: 'Comfort heritage-city hotel',
+        transportation: 'Private van transfer',
+        guide: 'Historical site guide',
         images: [
-            'images/package8.webp',
-            'images/package8.webp',
-            'images/package8.webp',
-            'images/package8.webp'
+            'images/package8_1.webp',
+            'images/package8_2.webp',
+            'images/package8_3.jpg',
+            'images/package8_4.webp'
         ],
-        highlights: ['Premium island resort', 'Snorkeling adventure', 'Beachfront dining', 'Sunset speedboat trip'],
+        highlights: ['Sri Maha Bodhi visit', 'Ruwanwelisaya and Jetavanaramaya', 'Ancient ruins and museums', 'Heritage-city hotel stay'],
         itinerary: [
-            { day: 'Day 1', activity: 'Arrival and resort welcome.' },
-            { day: 'Day 2', activity: 'Beach day and snorkeling.' },
-            { day: 'Day 3', activity: 'Spa or water sports experience.' }
+            { day: 'Day 1', activity: 'Travel to Anuradhapura and visit sacred city highlights.' },
+            { day: 'Day 2', activity: 'Continue historical site visits before returning home.' }
         ],
-        included: ['Beachfront resort stay', 'Daily breakfast', 'Speedboat transfers', 'Welcome dinner']
+        included: ['1-night hotel stay', 'Breakfast', 'Private transport', 'Historical guide support']
     }
 ];
 
@@ -385,7 +399,10 @@ function ensureDefaultData() {
         setStorage('users', defaultUsers);
     }
 
-    if (!getStorage('packages').length) {
+    if (localStorage.getItem(storageKey('packageDataVersion')) !== PACKAGE_DATA_VERSION) {
+        setStorage('packages', defaultPackages);
+        localStorage.setItem(storageKey('packageDataVersion'), PACKAGE_DATA_VERSION);
+    } else if (!getStorage('packages').length) {
         setStorage('packages', defaultPackages);
     }
 
@@ -595,7 +612,7 @@ function initBookingPage() {
         if (packageDuration) packageDuration.innerText = pkg.duration;
         if (packageTransport) packageTransport.innerText = pkg.transport;
         if (packagePrice) packagePrice.innerText = pkg.price;
-        if (packageDescription) packageDescription.innerText = pkg.desc;
+        if (packageDescription) packageDescription.innerText = `${pkg.location ? `${pkg.location}. ` : ''}${pkg.desc}`;
         if (!isPackageAvailable(pkg)) {
             showMessage(messageArea, 'This package is currently unavailable. Please choose another package.', 'warning');
             form.querySelector('button[type="submit"]')?.setAttribute('disabled', 'disabled');
@@ -984,7 +1001,7 @@ function buildDashboardMenu(items) {
             // Remove active highlight from all buttons and add it to the clicked one
             buttons.forEach(btn => btn.classList.remove('active'));
             button.classList.add('active');
-            
+
             // Load the actual content for this section
             loadDashboardSection(button.dataset.section);
         });
@@ -1013,32 +1030,32 @@ function renderTable(rows, headers) {
 
 function getActionButtons(section, userRole) {
     const buttons = [];
-    
+
     if (userRole === 'user') {
         if (section === 'bookings') buttons.push({ label: 'New Booking', id: 'newBooking', class: 'btn-primary' });
         if (section === 'queries') buttons.push({ label: 'Submit Query', id: 'submitQuery', class: 'btn-primary' });
         if (section === 'customize') buttons.push({ label: 'Save Plan', id: 'savePlan', class: 'btn-success' });
     }
-    
+
     if (userRole === 'staff') {
         if (section === 'confirmBookings') buttons.push({ label: 'Refresh', id: 'refreshBookings', class: 'btn-info' });
         if (section === 'customerQueries') buttons.push({ label: 'Export Queries', id: 'exportQueries', class: 'btn-secondary' });
         if (section === 'managePackages') buttons.push({ label: 'Add Package', id: 'addPackage', class: 'btn-primary' });
     }
-    
+
     if (userRole === 'admin') {
         if (section === 'manageUsers') buttons.push({ label: 'Bulk Actions', id: 'bulkActions', class: 'btn-warning' });
         if (section === 'confirmStaff') buttons.push({ label: 'Reset Approvals', id: 'resetApprovals', class: 'btn-danger' });
         if (section === 'reports') buttons.push({ label: 'Download Report', id: 'downloadReport', class: 'btn-success' });
     }
-    
+
     return buttons;
 }
 
 function renderActionButtons(section, userRole) {
     const buttons = getActionButtons(section, userRole);
     if (!buttons.length) return '';
-    
+
     return `
         <div class="mb-3 d-flex gap-2">
             ${buttons.map(btn => `<button class="btn ${btn.class} btn-sm" id="${btn.id}">${btn.label}</button>`).join('')}
@@ -1086,6 +1103,7 @@ function loadDashboardSection(section) {
                                 <img src="${pkg.images[0]}" class="card-img-top" alt="${pkg.name}">
                                 <div class="card-body">
                                     <h5 class="card-title">${pkg.name}</h5>
+                                    <p class="text-muted small mb-2"><i class="fa-solid fa-location-dot"></i> ${pkg.location || 'Sri Lanka'}</p>
                                     <p class="card-text text-muted mb-2">${pkg.desc}</p>
                                     <p class="mb-1"><strong>Duration:</strong> ${pkg.duration}</p>
                                     <p class="mb-1"><strong>Transport:</strong> ${pkg.transport}</p>
@@ -1183,11 +1201,12 @@ function loadDashboardSection(section) {
             content.innerHTML = `<h4>Manage Packages</h4>${renderActionButtons('managePackages', user.role)}${renderTable(packages.map(pkg => `
                     <tr>
                         <td>${pkg.name}</td>
+                        <td>${pkg.location || 'Sri Lanka'}</td>
                         <td>${pkg.duration}</td>
                         <td>${pkg.price}</td>
                         <td><span class="badge ${isPackageAvailable(pkg) ? 'bg-success' : 'bg-secondary'}">${isPackageAvailable(pkg) ? 'Available' : 'Unavailable'}</span></td>
                         <td><button class="btn btn-sm btn-outline-primary edit-package" data-id="${pkg.id}">Edit</button></td>
-                    </tr>`), ['Name', 'Duration', 'Price', 'Availability', 'Action'])}`;
+                    </tr>`), ['Name', 'Location', 'Duration', 'Price', 'Availability', 'Action'])}`;
             document.querySelectorAll('.edit-package').forEach(button => {
                 button.addEventListener('click', () => {
                     const pkgId = Number(button.dataset.id);
@@ -1196,6 +1215,7 @@ function loadDashboardSection(section) {
                         <h4>Edit Package</h4>
                         <form id="editPackageForm">
                             <div class="mb-3"><label class="form-label">Name</label><input class="form-control" id="packageNameEdit" value="${pkg.name}"></div>
+                            <div class="mb-3"><label class="form-label">Location</label><input class="form-control" id="packageLocationEdit" value="${pkg.location || ''}"></div>
                             <div class="mb-3"><label class="form-label">Price</label><input class="form-control" id="packagePriceEdit" value="${pkg.price}"></div>
                             <div class="mb-3"><label class="form-label">Duration</label><input class="form-control" id="packageDurationEdit" value="${pkg.duration}"></div>
                             <div class="mb-3"><label class="form-label">Description</label><textarea class="form-control" id="packageDescEdit" rows="4">${pkg.desc}</textarea></div>
@@ -1214,6 +1234,7 @@ function loadDashboardSection(section) {
                         packages[index] = {
                             ...packages[index],
                             name: document.getElementById('packageNameEdit').value.trim(),
+                            location: document.getElementById('packageLocationEdit').value.trim(),
                             price: document.getElementById('packagePriceEdit').value.trim(),
                             duration: document.getElementById('packageDurationEdit').value.trim(),
                             desc: document.getElementById('packageDescEdit').value.trim(),
@@ -1499,6 +1520,7 @@ function initPackagesPage() {
                         <div class="package-img" style="background-image:url('${pkg.images[0]}');height:200px;background-size:cover;background-position:center;"></div>
                         <div class="p-3">
                             <h3 class="h5 fw-bold mb-1">${pkg.name}</h3>
+                            <p class="text-muted small mb-1"><i class="fa-solid fa-location-dot"></i> ${pkg.location || 'Sri Lanka'}</p>
                             <p class="text-warning mb-1">⭐ ${pkg.rating}</p>
                             <p class="fw-bold text-success mb-2">${pkg.price}</p>
                             <span class="badge ${isPackageAvailable(pkg) ? 'bg-success' : 'bg-secondary'}">${isPackageAvailable(pkg) ? 'Available' : 'Unavailable'}</span>
@@ -1539,6 +1561,7 @@ function initDetailsPage() {
     document.getElementById('img2').src = pkg.images[2];
     document.getElementById('img3').src = pkg.images[3];
     document.getElementById('packageSpecs').innerHTML = `
+        <p><strong>Location:</strong> ${pkg.location || 'Sri Lanka'}</p>
         <p><strong>💰 Price:</strong> ${pkg.price}</p>
         <p><strong>🚌 Transport:</strong> ${pkg.transport}</p>
         <p><strong>📅 Duration:</strong> ${pkg.duration}</p>
@@ -1630,13 +1653,13 @@ document.addEventListener("globetrek-disabled", function () {
             { id: "managePackages", label: "Manage Packages" },
             { id: "reports", label: "View Reports" }
         ];
-    } 
+    }
     else if (role === "staff") {
         menuItems = [
             { id: "bookings", label: "Manage Bookings" },
             { id: "customers", label: "View Customers" }
         ];
-    } 
+    }
     else {
         menuItems = [
             { id: "myBookings", label: "My Bookings" },
@@ -1668,13 +1691,13 @@ document.addEventListener("globetrek-disabled", function () {
             { id: "managePackages", label: "Manage Packages" },
             { id: "reports", label: "Reports" }
         ];
-    } 
+    }
     else if (role === "staff") {
         menuItems = [
             { id: "bookings", label: "Bookings" },
             { id: "customers", label: "Customers" }
         ];
-    } 
+    }
     else {
         menuItems = [
             { id: "myBookings", label: "My Bookings" },

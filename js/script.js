@@ -5,7 +5,10 @@ document.addEventListener('DOMContentLoaded', function () {
             name: "Santorini Breeze", 
             rating: "4.8 (120 reviews)", 
             price: "LKR 12,000", 
-            images: ["images/package1_2.jpg", "images/package1.webp", "images/package1_3.webp", "images/package1_4.webp"],
+            images: ["images/package1_2.jpg",
+            "images/package1.jpg",
+            "images/package1_3.jpg",
+            "images/package1_4.webp"],
             desc: "Discover the breathtaking blue waters and iconic white architecture of Greece.",
             transport: "Ferry & Luxury Bus",
             duration: "3 Days, 2 Nights"
@@ -15,7 +18,10 @@ document.addEventListener('DOMContentLoaded', function () {
             name: "Bali Retreat", 
             rating: "4.9 (250 reviews)", 
             price: "LKR 15,000", 
-            images: ["images/package2.jpg", "images/package2_2.jpeg", "images/package2_3.webp", "images/package2_4.jpg"],
+            images: [ 'images/package2.webp',
+            'images/package2_2.webp',
+            'images/package2_3.webp',
+            'images/package2_4.jpg'],
             desc: "Relax in the tropical paradise of Bali with villas and temples.",
             transport: "Private Van",
             duration: "5 Days, 4 Nights"
@@ -25,7 +31,10 @@ document.addEventListener('DOMContentLoaded', function () {
             name: "Parisian Night", 
             rating: "4.7 (95 reviews)", 
             price: "LKR 10,000", 
-            images: ["images/package3.jpg", "images/package3_2.jpg", "images/package3_3.jpeg", "images/package3.jpg"],
+            images: ["images/package3.jpg",
+                "images/package3_2.jpeg",
+                "images/package3_3.webp",
+                "images/package3_4.jpg"],
             desc: "Enjoy the romance of Paris with Eiffel Tower dinner.",
             transport: "Metro & Walking Tour",
             duration: "2 Days, 1 Night"
@@ -35,7 +44,10 @@ document.addEventListener('DOMContentLoaded', function () {
             name: "Tokyo Explorer", 
             rating: "4.6 (180 reviews)", 
             price: "LKR 18,000", 
-            images: ["images/package4.webp", "images/package4.webp", "images/package4.webp", "images/package4.webp"],
+            images: ['images/package4.webp',
+            'images/package4_1.jpg',
+            'images/package4_2.jpeg',
+            'images/package4_3.jpg'],
             desc: "Explore Tokyo’s modern and traditional attractions.",
             transport: "Bullet Train",
             duration: "4 Days, 3 Nights"
@@ -45,7 +57,10 @@ document.addEventListener('DOMContentLoaded', function () {
             name: "Swiss Alps", 
             rating: "4.9 (310 reviews)", 
             price: "LKR 20,000", 
-            images: ["images/package5.jpeg", "images/package5.jpeg", "images/package5.jpeg", "images/package5.jpeg"],
+            images: ["images/package5.jpg",
+                "images/package5_1.jpg",
+                "images/package5_2.jpg",
+                "images/package5_3.jpg"],
             desc: "Mountain adventure with skiing and scenic views.",
             transport: "Cable Car",
             duration: "6 Days, 5 Nights"
@@ -55,7 +70,10 @@ document.addEventListener('DOMContentLoaded', function () {
             name: "Dubai Safari", 
             rating: "4.5 (150 reviews)", 
             price: "LKR 14,000", 
-            images: ["images/package6.webp", "images/package6.webp", "images/package6.webp", "images/package6.webp"],
+            images: ['images/package6.jpg',
+            'images/package6_1.jpg',
+            'images/package6_2.jpg',
+            'images/package6_3.jpg'],
             desc: "Desert safari with luxury experience.",
             transport: "4x4 Jeep",
             duration: "3 Days, 2 Nights"
@@ -65,7 +83,10 @@ document.addEventListener('DOMContentLoaded', function () {
             name: "London Classic", 
             rating: "4.4 (200 reviews)", 
             price: "LKR 14,000", 
-            images: ["images/package7.webp", "images/package7.webp", "images/package7.webp", "images/package7.webp"],
+            images: ['images/package7.jpg',
+            'images/package7_1.webp',
+            'images/package7_2.jpg',
+            'images/package7_3.webp'],
             desc: "Historic tour of London landmarks.",
             transport: "Bus",
             duration: "3 Days, 2 Nights"
@@ -75,7 +96,10 @@ document.addEventListener('DOMContentLoaded', function () {
             name: "Maldives Blue", 
             rating: "5.0 (80 reviews)", 
             price: "LKR 14,000", 
-            images: ["images/package8.webp", "images/package8.webp", "images/package8.webp", "images/package8.webp"],
+            images: ['images/package8_1.webp',
+            'images/package8_2.webp',
+            'images/package8_3.jpg',
+            'images/package8_4.webp'],
             desc: "Luxury island experience with clear waters.",
             transport: "Speedboat",
             duration: "4 Days, 3 Nights"
@@ -98,7 +122,18 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function packageMatchesSearch(pkg, searchText) {
         if (!searchText) return true;
-        return [pkg.name, pkg.desc, pkg.transport, pkg.duration, pkg.rating, pkg.price]
+        return [
+            pkg.name,
+            pkg.desc,
+            pkg.transport,
+            pkg.duration,
+            pkg.location,
+            pkg.rating,
+            pkg.price,
+            pkg.category,
+            pkg.accommodation,
+            ...(pkg.highlights || [])
+        ]
             .some(value => String(value).toLowerCase().includes(searchText));
     }
 
@@ -136,6 +171,7 @@ document.addEventListener('DOMContentLoaded', function () {
                             <div class="package-img" style="background-image:url('${pkg.images[0]}');height:200px;background-size:cover;background-position:center;"></div>
                             <div class="p-3">
                                 <h3 class="h5 fw-bold mb-1">${pkg.name}</h3>
+                                <p class="text-muted small mb-1"><i class="fa-solid fa-location-dot"></i> ${pkg.location || 'Sri Lanka'}</p>
                                 <p class="text-warning mb-1">⭐ ${pkg.rating}</p>
                                 <p class="fw-bold text-success mb-2">${pkg.price}</p>
                                 <span class="badge ${isPackageAvailable(pkg) ? 'bg-success' : 'bg-secondary'}">${isPackageAvailable(pkg) ? 'Available' : 'Unavailable'}</span>

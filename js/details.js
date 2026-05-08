@@ -9,8 +9,8 @@
             rating: "4.8 (120 reviews)",
             images: [
                 "images/package1_2.jpg",
-                "images/package1.webp",
-                "images/package1_3.webp",
+                "images/package1.jpg",
+                "images/package1_3.jpg",
                 "images/package1_4.webp"
             ],
             highlights: [
@@ -39,10 +39,10 @@
             duration: "5 Days, 4 Nights",
             rating: "4.9 (250 reviews)",
             images: [
-                "images/package2.jpg",
-                "images/package2_2.jpeg",
-                "images/package2_3.webp",
-                "images/package2_4.jpg"
+                'images/package2.webp',
+            'images/package2_2.webp',
+            'images/package2_3.webp',
+            'images/package2_4.jpg'
             ],
             highlights: [
                 "Secluded villa accommodation",
@@ -71,9 +71,9 @@
             rating: "4.7 (95 reviews)",
             images: [
                 "images/package3.jpg",
-                "images/package3_2.jpg",
-                "images/package3_3.jpeg",
-                "images/package3.jpg"
+                "images/package3_2.jpeg",
+                "images/package3_3.webp",
+                "images/package3_4.jpg"
             ],
             highlights: [
                 "Eiffel Tower dinner experience",
@@ -100,10 +100,10 @@
             duration: "4 Days, 3 Nights",
             rating: "4.6 (180 reviews)",
             images: [
-                "images/package4.webp",
-                "images/package4.webp",
-                "images/package4.webp",
-                "images/package4.webp"
+                'images/package4.webp',
+            'images/package4_1.jpg',
+            'images/package4_2.jpeg',
+            'images/package4_3.jpg'
             ],
             highlights: [
                 "Bullet train experience",
@@ -131,10 +131,10 @@
             duration: "6 Days, 5 Nights",
             rating: "4.9 (310 reviews)",
             images: [
-                "images/package5.jpeg",
-                "images/package5.jpeg",
-                "images/package5.jpeg",
-                "images/package5.jpeg"
+                "images/package5.jpg",
+                "images/package5_1.jpg",
+                "images/package5_2.jpg",
+                "images/package5_3.jpg"
             ],
             highlights: [
                 "Panoramic alpine views",
@@ -162,10 +162,10 @@
             duration: "3 Days, 2 Nights",
             rating: "4.5 (150 reviews)",
             images: [
-                "images/package6.webp",
-                "images/package6.webp",
-                "images/package6.webp",
-                "images/package6.webp"
+                'images/package6.jpg',
+            'images/package6_1.jpg',
+            'images/package6_2.jpg',
+            'images/package6_3.jpg'
             ],
             highlights: [
                 "Desert dune drive",
@@ -193,10 +193,10 @@
             duration: "3 Days, 2 Nights",
             rating: "4.4 (200 reviews)",
             images: [
-                "images/package7.webp",
-                "images/package7.webp",
-                "images/package7.webp",
-                "images/package7.webp"
+                'images/package7.jpg',
+            'images/package7_1.webp',
+            'images/package7_2.jpg',
+            'images/package7_3.webp'
             ],
             highlights: [
                 "Classic city landmarks",
@@ -224,10 +224,10 @@
             duration: "4 Days, 3 Nights",
             rating: "5.0 (80 reviews)",
             images: [
-                "images/package8.webp",
-                "images/package8.webp",
-                "images/package8.webp",
-                "images/package8.webp"
+                'images/package8_1.webp',
+            'images/package8_2.webp',
+            'images/package8_3.jpg',
+            'images/package8_4.webp'
             ],
             highlights: [
                 "Premium island resort stay",
@@ -249,12 +249,13 @@
         }
     ];
 
-    travelPackages.forEach((pkg, idx) => { pkg.id = idx; });
+    const packageSource = Array.isArray(window.packageData) && window.packageData.length ? window.packageData : travelPackages;
+    packageSource.forEach((pkg, idx) => { pkg.id = typeof pkg.id === 'number' ? pkg.id : idx; });
 
     const urlParams = new URLSearchParams(window.location.search);
     const id = Number(urlParams.get('id'));
 
-    const pkg = travelPackages.find(packageItem => packageItem.id === id);
+    const pkg = packageSource.find(packageItem => packageItem.id === id);
     if (!pkg) return;
 
     document.getElementById('detailTitle').innerText = pkg.name;
@@ -271,6 +272,7 @@
 
     document.getElementById('packageSpecs').innerHTML = `
         <p><strong>💰 Price:</strong> ${pkg.price}</p>
+        <p><strong>Location:</strong> ${pkg.location || 'Sri Lanka'}</p>
         <p><strong>🚌 Transport:</strong> ${pkg.transport}</p>
         <p><strong>📅 Duration:</strong> ${pkg.duration}</p>
         <p><strong>⭐ Rating:</strong> ${pkg.rating}</p>

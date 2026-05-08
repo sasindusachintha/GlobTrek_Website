@@ -88,8 +88,7 @@
 }
 
 .nav-tabs-custom .nav-link {
-    border: none;
-    background: none;
+
     padding: 0 0 8px 0;
     display: flex;
     align-items: center;
@@ -940,3 +939,6 @@ a:hover {
         justify-content: flex-start;
     }
 }
+
+
+
