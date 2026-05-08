@@ -179,20 +179,12 @@ document.addEventListener('DOMContentLoaded', function () {
                         </a>
                         <div class="p-3 pt-0 d-flex justify-content-between align-items-center">
                             <button class="btn btn-primary btn-sm rounded-pill" ${isPackageAvailable(pkg) ? '' : 'disabled'} onclick="window.location.href='booking.html?id=${pkg.id}'">${isPackageAvailable(pkg) ? 'Book Now' : 'Unavailable'}</button>
-                            <i class="fa-regular fa-heart favorite-icon"></i>
                         </div>
                     </div>
                 </div>
             `;
         });
 
-        document.querySelectorAll('.favorite-icon').forEach(heart => {
-            heart.addEventListener('click', function () {
-                this.classList.toggle('fa-solid');
-                this.classList.toggle('fa-regular');
-                this.style.color = this.classList.contains('fa-solid') ? '#e03a3c' : '#000';
-            });
-        });
     }
 
     function filterPackages() {
