@@ -478,6 +478,70 @@ section.container {
     color: #6b6b84;
 }
 
+.payment-details .detail-row.total-row {
+    margin-top: 1rem;
+    padding-top: 0.95rem;
+    border-top: 1px solid #e6e4f4;
+    font-weight: 700;
+    color: #2c2764;
+}
+
+.payment-package-card {
+    display: flex;
+    gap: 18px;
+    align-items: center;
+    background: #f8f7ff;
+    border-radius: 24px;
+    padding: 20px;
+}
+
+.package-thumb {
+    width: 110px;
+    min-width: 110px;
+    height: 110px;
+    border-radius: 20px;
+    overflow: hidden;
+    background: #ededff;
+    box-shadow: 0 12px 30px rgba(49, 34, 131, 0.08);
+}
+
+.package-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.package-summary-text h5 {
+    margin-bottom: 0.5rem;
+    font-size: 1.2rem;
+    color: #2f2858;
+}
+
+.package-summary-text p {
+    margin-bottom: 0.85rem;
+    color: #6b6b84;
+    line-height: 1.45;
+}
+
+.package-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    color: #6b6b84;
+    font-size: 0.95rem;
+}
+
+.package-meta span {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.package-meta i {
+    color: #7049b8;
+    font-size: 0.95rem;
+}
+
 .about-us-section {
     padding: 80px 0;
 }
