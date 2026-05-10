@@ -121,7 +121,7 @@ $activePage = 'contact';
                     <p>From luxury escapes to cultural city breaks, our team tailors each itinerary to your interests, comfort, and budget.</p>
                     <p>We believe travel should feel effortless and inspiring. Let GlobeTrek guide your next adventure with clarity and confidence.</p>
                     <div class="about-contact">
-                        <p><i class="fa-solid fa-envelope"></i> hello@globetrek-adventures.test</p>
+                        <p><i class="fa-solid fa-envelope"></i> hello@globetrek-adventures@gmail.com</p>
                         <p><i class="fa-solid fa-phone"></i> +94 77 456 8890</p>
                     </div>
                 </div>
