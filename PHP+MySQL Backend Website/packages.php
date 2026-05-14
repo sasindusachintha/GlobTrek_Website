@@ -1,6 +1,6 @@
 <?php
 define('IN_SITE', true);
-require_once __DIR__ . '/functions.php';
+require_once __DIR__ . '/includes/functions.php';
 $packages = fetchAllPackages();
 $activePage = 'packages';
 ?>
@@ -13,11 +13,11 @@ $activePage = 'packages';
     <title>Packages | GlobeTrek</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="assets/css/style.css">
 </head>
 
 <body>
-    <?php include __DIR__ . '/header.php'; ?>
+    <?php include __DIR__ . '/includes/header.php'; ?>
 
     <section class="container mt-5 pt-4">
         <h2 class="section-title text-start mb-4">Explore Packages</h2>
@@ -27,7 +27,7 @@ $activePage = 'packages';
                     <div class="package-card shadow-sm border rounded-3 overflow-hidden bg-white h-100">
                         <a href="package-details.php?id=<?= h($pkg['package_id']) ?>" class="text-decoration-none text-dark">
                             <div class="package-img"
-                                style="background-image:url('<?= h($pkg['image'] ?: 'images/hero1.jpg') ?>');height:200px;background-size:cover;background-position:center;"></div>
+                                style="background-image:url('<?= h(assetPath($pkg['image'] ?? '', 'assets/images/hero1.jpg')) ?>');height:200px;background-size:cover;background-position:center;"></div>
                             <div class="p-3">
                                 <h3 class="h5 fw-bold mb-1"><?= h($pkg['title']) ?></h3>
                                 <p class="text-muted small mb-1"><i class="fa-solid fa-location-dot"></i> <?= h($pkg['location'] ?? '') ?></p>
@@ -48,8 +48,8 @@ $activePage = 'packages';
     </section>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="js/app.js"></script>
-    <script src="js/script.js"></script>
+    <script src="assets/js/app.js"></script>
+    <script src="assets/js/script.js"></script>
 </body>
 
 </html>

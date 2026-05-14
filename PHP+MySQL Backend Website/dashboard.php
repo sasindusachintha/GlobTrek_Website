@@ -13,8 +13,8 @@ if (!isset($_SESSION['user_id'])) {
 }
 
 define('IN_SITE', true);
-require_once __DIR__ . '/config.php';
-require_once __DIR__ . '/functions.php';
+require_once __DIR__ . '/config/db.php';
+require_once __DIR__ . '/includes/functions.php';
 requireLogin();
 $user = currentUser();
 $role = userRole();
@@ -180,7 +180,15 @@ $users = fetchAllUsers();
 $userBookings = fetchBookingsByUserId($user['user_id']);
 $userQueries = fetchUserQueries($user['email']);
 $userPayments = fetchPaymentsByUserId($user['user_id']);
-$staffUsers = fetchStaffUsers();
+// Staff pagination settings.
+$staffLimit = 5;
+$totalStaffUsers = countStaffUsers();
+$staffTotalPages = max(1, ceil($totalStaffUsers / $staffLimit));
+$staffPage = max(1, intval($_GET['page'] ?? 1));
+$staffPage = min($staffPage, $staffTotalPages);
+$staffOffset = ($staffPage - 1) * $staffLimit;
+$staffUsers = fetchStaffUsers($staffLimit, $staffOffset);
+$hasNextStaffPage = ($staffOffset + $staffLimit) < $totalStaffUsers;
 $totalUsers = countTotalUsers();
 $totalBookings = countTotalBookings();
 $totalRevenue = sumTotalRevenue();
@@ -227,11 +235,11 @@ if ($download === 'report' && $role === 'admin') {
     <title>Dashboard | GlobeTrek</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="assets/css/style.css">
 </head>
 
 <body>
-    <?php include __DIR__ . '/header.php'; ?>
+    <?php include __DIR__ . '/includes/header.php'; ?>
 
     <main class="page-layout">
         <div class="container py-4">
@@ -278,7 +286,7 @@ if ($download === 'report' && $role === 'admin') {
                                 <?php foreach ($packages as $pkg): ?>
                                     <div class="col-md-6 col-xl-4">
                                         <div class="card h-100 shadow-sm border-0">
-                                            <img src="<?= h($pkg['image'] ?: 'images/hero1.jpg') ?>" class="card-img-top" alt="<?= h($pkg['title']) ?>">
+                                            <img src="<?= h(assetPath($pkg['image'] ?? '', 'assets/images/hero1.jpg')) ?>" class="card-img-top" alt="<?= h($pkg['title']) ?>">
                                             <div class="card-body">
                                                 <h5 class="card-title"><?= h($pkg['title']) ?></h5>
                                                 <p class="text-muted small mb-2"><i class="fa-solid fa-location-dot"></i> <?= h($pkg['location'] ?? '') ?></p>
@@ -631,6 +639,16 @@ if ($download === 'report' && $role === 'admin') {
                                         </tbody>
                                     </table>
                                 </div>
+                                <div class="d-flex gap-2 mt-3">
+                                    <!-- Previous is hidden on page 1. Next is hidden on the last page. -->
+                                    <?php if ($staffPage > 1): ?>
+                                        <a class="btn btn-outline-secondary btn-sm" href="dashboard.php?section=confirmStaff&page=<?= h($staffPage - 1) ?>">Previous</a>
+                                    <?php endif; ?>
+
+                                    <?php if ($hasNextStaffPage): ?>
+                                        <a class="btn btn-outline-primary btn-sm" href="dashboard.php?section=confirmStaff&page=<?= h($staffPage + 1) ?>">Next</a>
+                                    <?php endif; ?>
+                                </div>
                             <?php else: ?>
                                 <p>No staff accounts yet.</p>
                             <?php endif; ?>
@@ -678,7 +696,7 @@ if ($download === 'report' && $role === 'admin') {
         </div>
     </main>
 
-    <script src="js/app.js"></script>
+    <script src="assets/js/app.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 

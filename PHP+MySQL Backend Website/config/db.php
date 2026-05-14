@@ -1,29 +1,25 @@
 <?php
-// =========================
+
 // ERROR REPORTING (DEV ONLY)
-// =========================
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
-// =========================
+
 // SESSION
-// =========================
 if (PHP_SAPI !== 'cli' && session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-// =========================
+
 // DATABASE CONFIG
-// =========================
 $host = "localhost";
 $username = "root";
 $password = "";
 $database = "globtrek_db";
 
-// =========================
+
 // DATABASE CONNECTION (SINGLE SOURCE)
-// =========================
 function db() {
     static $conn;
 
@@ -44,9 +40,8 @@ function db() {
     return $conn;
 }
 
-// =========================
+
 // CHECK COLUMN EXISTS
-// =========================
 function columnExists($table, $column) {
     $conn = db();
 
@@ -86,9 +81,8 @@ function configTableExists($table) {
     return $count > 0;
 }
 
-// =========================
+
 // AUTO SCHEMA UPDATE
-// =========================
 function ensureSchema() {
     $conn = db();
 
@@ -147,52 +141,8 @@ function ensureSchema() {
 
 }
 
-// =========================
+
 // RUN SCHEMA CHECK
-// =========================
 ensureSchema();
 
-// =========================
-// HELPERS
-// =========================
-function h($value) {
-    return htmlspecialchars($value, ENT_QUOTES, 'UTF-8');
-}
 
-function redirect($url) {
-    header('Location: ' . $url);
-    exit;
-}
-
-function currentUser() {
-    if (!empty($_SESSION['user_id']) && function_exists('fetchUserById')) {
-        $freshUser = fetchUserById($_SESSION['user_id']);
-        if ($freshUser) {
-            $freshUser['role'] = normalizeRole($freshUser['role']);
-            $_SESSION['user'] = $freshUser;
-            $_SESSION['role'] = $freshUser['role'];
-            return $freshUser;
-        }
-    }
-
-    if (!empty($_SESSION['user']['user_id'])) {
-        $_SESSION['user_id'] = $_SESSION['user']['user_id'];
-        $_SESSION['role'] = normalizeRole($_SESSION['user']['role'] ?? 'customer');
-        return $_SESSION['user'];
-    }
-
-    return null;
-}
-
-function isLoggedIn() {
-    return !empty($_SESSION['user_id']) && currentUser();
-}
-
-function normalizeRole($role) {
-    $role = strtolower(trim((string)$role));
-
-    if ($role === 'admin') return 'admin';
-    if ($role === 'staff') return 'staff';
-
-    return 'customer'; // default
-}

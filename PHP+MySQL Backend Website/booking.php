@@ -17,7 +17,7 @@ header("Cache-Control: post-check=0, pre-check=0", false);
 header("Pragma: no-cache");
 
 define('IN_SITE', true);
-require_once __DIR__ . '/functions.php';
+require_once __DIR__ . '/includes/functions.php';
 requireLogin();
 $packageId = isset($_POST['package_id']) ? intval($_POST['package_id']) : (isset($_GET['id']) ? intval($_GET['id']) : 0);
 $package = fetchPackageById($packageId);
@@ -59,11 +59,11 @@ $activePage = 'booking';
   <title>Booking | GlobeTrek</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="assets/css/style.css">
 </head>
 
 <body>
-  <?php include __DIR__ . '/header.php'; ?>
+  <?php include __DIR__ . '/includes/header.php'; ?>
 
   <main class="page-layout">
     <div class="container">
@@ -136,7 +136,7 @@ $activePage = 'booking';
     </div>
   </main>
 
-  <script src="js/app.js"></script>
+  <script src="assets/js/app.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 

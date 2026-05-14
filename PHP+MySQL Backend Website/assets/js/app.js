@@ -9,7 +9,7 @@ function initSiteFooter() {
             <div class="site-footer-main">
                 <div>
                     <a class="site-footer-brand" href="index.php">
-                        <img src="images/logo.png" alt="GlobeTrek Logo">
+                        <img src="assets/images/logo.png" alt="GlobeTrek Logo">
                         <span>GlobeTrek Adventures</span>
                     </a>
                     <p>Curated travel packages, simple booking, and reliable trip support from planning to return.</p>

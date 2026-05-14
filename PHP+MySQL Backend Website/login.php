@@ -1,6 +1,6 @@
 <?php
 define('IN_SITE', true);
-require_once __DIR__ . '/functions.php';
+require_once __DIR__ . '/includes/functions.php';
 
 $errorMessage = '';
 $redirect = 'dashboard.php'; // default safe page
@@ -81,11 +81,11 @@ $activePage = 'login';
     <title>Login | GlobeTrek</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="assets/css/style.css">
 </head>
 
 <body>
-    <?php include __DIR__ . '/header.php'; ?>
+    <?php include __DIR__ . '/includes/header.php'; ?>
 
     <main class="auth-page">
         <div class="container">
@@ -96,7 +96,7 @@ $activePage = 'login';
                             <div>
                                 <div class="d-flex align-items-center gap-2 mb-4">
                                     <span class="badge bg-white text-primary px-3 py-2 rounded-pill d-inline-flex align-items-center gap-2">
-                                        <img src="images/logo.png" width="20" height="20" alt="Logo">
+                                        <img src="assets/images/logo.png" width="20" height="20" alt="Logo">
                                         GlobeTrek Adventures
                                     </span>
                                 </div>
@@ -128,7 +128,7 @@ $activePage = 'login';
             </div>
         </div>
     </main>
-    <script src="js/app.js"></script>
+    <script src="assets/js/app.js"></script>
 </body>
 
 </html>

@@ -8,7 +8,7 @@ $active = $activePage ?? '';
 <nav class="navbar navbar-expand-lg bg-white sticky-top">
     <div class="container-fluid">
         <a class="navbar-brand" href="index.php">
-            <img src="images/logo.png" alt="GlobeTrek Logo" class="me-2 logo">
+            <img src="assets/images/logo.png" alt="GlobeTrek Logo" class="me-2 logo">
             GlobeTrek Adventures
         </a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">

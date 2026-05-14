@@ -1,5 +1,65 @@
 <?php
-require_once __DIR__ . '/config/config.php';
+require_once __DIR__ . '/../config/db.php';
+
+function h($value) {
+    return htmlspecialchars($value, ENT_QUOTES, 'UTF-8');
+}
+
+function assetPath($path, $fallback = '') {
+    $path = trim((string)$path);
+
+    if ($path === '') {
+        return $fallback;
+    }
+
+    if (preg_match('/^(https?:)?\/\//i', $path) || str_starts_with($path, 'assets/')) {
+        return $path;
+    }
+
+    if (str_starts_with($path, 'images/')) {
+        return 'assets/' . $path;
+    }
+
+    return $path;
+}
+
+function redirect($url) {
+    header('Location: ' . $url);
+    exit;
+}
+
+function currentUser() {
+    if (!empty($_SESSION['user_id']) && function_exists('fetchUserById')) {
+        $freshUser = fetchUserById($_SESSION['user_id']);
+        if ($freshUser) {
+            $freshUser['role'] = normalizeRole($freshUser['role']);
+            $_SESSION['user'] = $freshUser;
+            $_SESSION['role'] = $freshUser['role'];
+            return $freshUser;
+        }
+    }
+
+    if (!empty($_SESSION['user']['user_id'])) {
+        $_SESSION['user_id'] = $_SESSION['user']['user_id'];
+        $_SESSION['role'] = normalizeRole($_SESSION['user']['role'] ?? 'customer');
+        return $_SESSION['user'];
+    }
+
+    return null;
+}
+
+function isLoggedIn() {
+    return !empty($_SESSION['user_id']) && currentUser();
+}
+
+function normalizeRole($role) {
+    $role = strtolower(trim((string)$role));
+
+    if ($role === 'admin') return 'admin';
+    if ($role === 'staff') return 'staff';
+
+    return 'customer';
+}
 
 function query($sql, array $params = []) {
     $conn = db();
@@ -189,7 +249,11 @@ function fetchBookingsByUserId($userId) {
     $packageTable = packageTable();
     $packageIdColumn = packageIdColumn();
     $titleColumn = packageTitleColumn();
-    $stmt = query("SELECT b.*, p.`$titleColumn` AS package_title, p.price AS package_price, b.return_date, b.phone FROM bookings b LEFT JOIN `$packageTable` p ON b.package_id = p.`$packageIdColumn` WHERE b.user_id = ? ORDER BY b.created_at DESC", [$userId]);
+    $stmt = query("SELECT b.*, p.`$titleColumn` AS package_title, p.price AS package_price, b.return_date, b.phone 
+                     FROM bookings b LEFT JOIN `$packageTable` p 
+                     ON b.package_id = p.`$packageIdColumn` 
+                     WHERE b.user_id = ? 
+                     ORDER BY b.created_at DESC", [$userId]);
     $result = $stmt->get_result();
     return $result->fetch_all(MYSQLI_ASSOC);
 }
@@ -198,7 +262,12 @@ function fetchAllBookings() {
     $packageTable = packageTable();
     $packageIdColumn = packageIdColumn();
     $titleColumn = packageTitleColumn();
-    $stmt = query("SELECT b.*, u.full_name AS customer_name, p.`$titleColumn` AS package_title FROM bookings b LEFT JOIN users u ON b.user_id = u.user_id LEFT JOIN `$packageTable` p ON b.package_id = p.`$packageIdColumn` ORDER BY b.created_at DESC");
+    $stmt = query("SELECT b.*, u.full_name AS customer_name, p.`$titleColumn` AS package_title 
+    FROM bookings b LEFT JOIN users u 
+    ON b.user_id = u.user_id 
+    LEFT JOIN `$packageTable` p 
+    ON b.package_id = p.`$packageIdColumn` 
+    ORDER BY b.created_at DESC");
     $result = $stmt->get_result();
     return $result->fetch_all(MYSQLI_ASSOC);
 }
@@ -273,10 +342,20 @@ function sumTotalRevenue() {
     return floatval($result->fetch_assoc()['total'] ?? 0);
 }
 
-function fetchStaffUsers() {
-    $stmt = query('SELECT * FROM users WHERE role = ? ORDER BY user_id ASC', ['staff']);
+function fetchStaffUsers($limit, $offset) {
+    // Get only one page of staff records.
+    $limit = intval($limit);
+    $offset = intval($offset);
+    $stmt = query('SELECT * FROM users WHERE role = ? ORDER BY user_id ASC LIMIT ? OFFSET ?', ['staff', $limit, $offset]);
     $result = $stmt->get_result();
     return $result->fetch_all(MYSQLI_ASSOC);
+}
+
+function countStaffUsers() {
+    // Count all staff records so the Next button only appears when needed.
+    $stmt = query('SELECT COUNT(*) AS total FROM users WHERE role = ?', ['staff']);
+    $result = $stmt->get_result();
+    return intval($result->fetch_assoc()['total'] ?? 0);
 }
 
 function insertBooking($userId, $packageId, $travelDate, $returnDate, $guests, $phone, $totalPrice) {
@@ -315,8 +394,10 @@ function fetchBookingById($bookingId) {
 function createPackage(array $data) {
     $table = packageTable();
     query(
-        "INSERT INTO `$table` (title, location, description, price, image, category, availability, duration, transport, rating, highlights, itinerary, included) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-        [$data['title'], $data['location'], $data['description'], $data['price'], $data['image'], $data['category'], $data['availability'], $data['duration'], $data['transport'], $data['rating'], $data['highlights'], $data['itinerary'], $data['included']]
+        "INSERT INTO `$table` (title, location, description, price, image, category, availability, duration, transport, rating, highlights, itinerary, included) 
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+        [$data['title'], $data['location'], $data['description'], $data['price'], $data['image'], $data['category'], 
+        $data['availability'], $data['duration'], $data['transport'], $data['rating'], $data['highlights'], $data['itinerary'], $data['included']]
     );
     return db()->insert_id;
 }
@@ -324,8 +405,11 @@ function createPackage(array $data) {
 function updatePackage($packageId, array $data) {
     $table = packageTable();
     query(
-        "UPDATE `$table` SET title = ?, location = ?, description = ?, price = ?, image = ?, category = ?, availability = ?, duration = ?, transport = ?, rating = ?, highlights = ?, itinerary = ?, included = ? WHERE package_id = ?",
-        [$data['title'], $data['location'], $data['description'], $data['price'], $data['image'], $data['category'], $data['availability'], $data['duration'], $data['transport'], $data['rating'], $data['highlights'], $data['itinerary'], $data['included'], $packageId]
+        "UPDATE `$table` SET title = ?, location = ?, description = ?, price = ?, image = ?, category = ?,
+         availability = ?, duration = ?, transport = ?, rating = ?, highlights = ?, itinerary = ?, included = ? WHERE package_id = ?",
+        [$data['title'], $data['location'], $data['description'], $data['price'], $data['image'],
+         $data['category'], $data['availability'], $data['duration'], $data['transport'], $data['rating'],
+         $data['highlights'], $data['itinerary'], $data['included'], $packageId]
     );
 }
 

@@ -1,8 +1,8 @@
 <?php
 define('IN_SITE', true);
-require_once __DIR__ . '/functions.php';
+require_once __DIR__ . '/includes/functions.php';
 $errorMessage = '';
-success:
+
 $successMessage = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $name = trim($_POST['registerName'] ?? '');
@@ -37,11 +37,11 @@ $activePage = 'register';
     <title>Register | GlobeTrek</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="assets/css/style.css">
 </head>
 
 <body>
-    <?php include __DIR__ . '/header.php'; ?>
+    <?php include __DIR__ . '/includes/header.php'; ?>
 
     <main class="auth-page">
         <div class="container">
@@ -51,29 +51,37 @@ $activePage = 'register';
                         <div class="col-lg-6 auth-side p-5 d-flex flex-column justify-content-center">
                             <div>
                                 <div class="d-flex align-items-center gap-2 mb-4">
-                                    <span class="badge bg-white text-primary px-3 py-2 rounded-pill d-inline-flex align-items-center gap-2">
-                                        <img src="images/logo.png" width="20" height="20" alt="Logo">
+                                    <span
+                                        class="badge bg-white text-primary px-3 py-2 rounded-pill d-inline-flex align-items-center gap-2">
+                                        <img src="assets/images/logo.png" width="20" height="20" alt="Logo">
                                         GlobeTrek Adventures
                                     </span>
                                 </div>
                                 <h1 class="display-6 fw-bold">Create an account</h1>
-                                <p class="mt-4">Join GlobeTrek and start booking unforgettable trips with exclusive offers, curated accommodations and seamless support.</p>
+                                <p class="mt-4">Join GlobeTrek and start booking unforgettable trips with exclusive
+                                    offers, curated accommodations and seamless support.</p>
                             </div>
                         </div>
                         <div class="col-lg-6 page-form">
                             <h2>Register</h2>
                             <form id="registerForm" method="post">
                                 <div class="mb-3">
-                                    <input id="registerName" name="registerName" type="text" class="form-control form-control-lg" placeholder="Name" value="<?= h($_POST['registerName'] ?? '') ?>">
+                                    <input id="registerName" name="registerName" type="text"
+                                        class="form-control form-control-lg" placeholder="Name"
+                                        value="<?= h($_POST['registerName'] ?? '') ?>">
                                 </div>
                                 <div class="mb-3">
-                                    <input id="registerEmail" name="registerEmail" type="email" class="form-control form-control-lg" placeholder="Email" value="<?= h($_POST['registerEmail'] ?? '') ?>">
+                                    <input id="registerEmail" name="registerEmail" type="email"
+                                        class="form-control form-control-lg" placeholder="Email"
+                                        value="<?= h($_POST['registerEmail'] ?? '') ?>">
                                 </div>
                                 <div class="mb-3">
-                                    <input id="registerPassword" name="registerPassword" type="password" class="form-control form-control-lg" placeholder="Password">
+                                    <input id="registerPassword" name="registerPassword" type="password"
+                                        class="form-control form-control-lg" placeholder="Password">
                                 </div>
                                 <div class="mb-3">
-                                    <input id="registerConfirmPassword" name="registerConfirmPassword" type="password" class="form-control form-control-lg" placeholder="Confirm Password">
+                                    <input id="registerConfirmPassword" name="registerConfirmPassword" type="password"
+                                        class="form-control form-control-lg" placeholder="Confirm Password">
                                 </div>
                                 <div class="mb-4">
                                     <select id="registerRole" name="registerRole" class="form-select form-select-lg">
@@ -91,7 +99,8 @@ $activePage = 'register';
                                     <div id="registerMessage" class="mb-3 text-danger"></div>
                                 <?php endif; ?>
                                 <button type="submit" class="btn btn-primary btn-lg w-100">Register</button>
-                                <p class="text-center text-muted mt-4">Already have an account? <a href="login.php">Login</a></p>
+                                <p class="text-center text-muted mt-4">Already have an account? <a
+                                        href="login.php">Login</a></p>
                             </form>
                         </div>
                     </div>
@@ -100,7 +109,7 @@ $activePage = 'register';
         </div>
     </main>
 
-    <script src="js/app.js"></script>
+    <script src="assets/js/app.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 
