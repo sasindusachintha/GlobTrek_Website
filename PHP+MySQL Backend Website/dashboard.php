@@ -1,5 +1,5 @@
 <?php
-if (session_status() === PHP_SESSION_NONE) {
+if (PHP_SAPI !== 'cli' && session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
@@ -22,6 +22,9 @@ $activePage = 'dashboard';
 $section = trim($_GET['section'] ?? '');
 $task = trim($_GET['task'] ?? '');
 $actionMessage = '';
+$actionAlertClass = 'success';
+$editPackage = null;
+$contentTask = '';
 
 $menuByRole = [
     'user' => [
@@ -51,6 +54,10 @@ $menuByRole = [
         'reports' => 'Generate Reports',
     ],
 ];
+
+if (!isset($menuByRole[$role])) {
+    $role = 'user';
+}
 
 if (!array_key_exists($section, $menuByRole[$role])) {
     $section = array_key_first($menuByRole[$role]);
@@ -87,16 +94,48 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     if ($action === 'reset_approvals' && $role === 'admin') {
-        query('UPDATE users SET status = 0 WHERE role = ?', ['staff']);
+        query('UPDATE users SET status = ? WHERE role = ?', [0, 'staff']);
         $actionMessage = 'All staff approvals reset.';
     }
 
-    if ($action === 'reply_query' && $role === 'staff') {
+    if ($action === 'reply_query' && ($role === 'staff' || $role === 'admin')) {
         $queryId = intval($_POST['query_id'] ?? 0);
         $response = trim($_POST['queryResponse'] ?? '');
-        if ($response !== '') {
-            query('UPDATE queries SET message = CONCAT(message, "\n\nResponse: ", ?), status = ? WHERE query_id = ?', [$response, 'responded', $queryId]);
+
+        if ($queryId > 0 && $response !== '') {
+            query(
+                'UPDATE queries SET message = CONCAT(COALESCE(message, ""), ?, ?), status = ? WHERE query_id = ?',
+                ["\n\nResponse: ", $response, 'responded', $queryId]
+            );
             $actionMessage = 'Reply sent to customer query.';
+            $task = '';
+        }
+    }
+
+    if ($action === 'update_hotel_coordination' && $role === 'staff') {
+        $hotelId = intval($_POST['hotel_id'] ?? 0);
+        $hotelStatus = strtolower(trim($_POST['hotelStatus'] ?? 'pending'));
+        $contactPersonName = trim($_POST['hotelContactPersonName'] ?? '');
+        $contactPhone = trim($_POST['hotelContactPhone'] ?? '');
+        $contactEmail = trim($_POST['hotelContactEmail'] ?? '');
+
+        if (in_array($hotelStatus, ['confirmed', 'pending'], true) && $hotelId > 0) {
+            updateHotelCoordination($hotelId, $hotelStatus, $contactPersonName, $contactPhone, $contactEmail);
+            $actionMessage = 'Hotel coordination updated.';
+            $task = '';
+        }
+    }
+
+    if ($action === 'update_transport_coordination' && $role === 'staff') {
+        $transportId = intval($_POST['transport_id'] ?? 0);
+        $transportStatus = strtolower(trim($_POST['transportStatus'] ?? 'scheduled'));
+        $contactName = trim($_POST['transportContactName'] ?? '');
+        $contactPhone = trim($_POST['transportContactPhone'] ?? '');
+
+        if (in_array($transportStatus, ['ready', 'confirmed', 'scheduled'], true) && $transportId > 0) {
+            updateTransportCoordination($transportId, $transportStatus, $contactName, $contactPhone);
+            $actionMessage = 'Transport coordination updated.';
+            $task = '';
         }
     }
 
@@ -146,6 +185,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $task = '';
         }
     }
+
+    if ($action === 'delete_package' && ($role === 'staff' || $role === 'admin')) {
+        $packageId = intval($_POST['package_id'] ?? 0);
+        if ($packageId > 0 && deletePackage($packageId)) {
+            $actionMessage = 'Package deleted successfully.';
+            $task = '';
+        } else {
+            $actionMessage = 'Package cannot be deleted because it has existing bookings or reviews.';
+            $actionAlertClass = 'warning';
+        }
+    }
 }
 
 if ($section === 'managePackages' && $task === 'add') {
@@ -157,8 +207,6 @@ if ($section === 'managePackages' && $task === 'add') {
     if (!$editPackage) {
         $contentTask = '';
     }
-} else {
-    $contentTask = '';
 }
 
 if ($role === 'staff' && !isset($menuByRole['staff'][$section])) {
@@ -176,26 +224,41 @@ $packages = fetchAllPackages();
 $hotels = fetchHotelRecords();
 $transports = fetchTransportRecords();
 $queries = fetchAllQueries();
-$users = fetchAllUsers();
 $userBookings = fetchBookingsByUserId($user['user_id']);
 $userQueries = fetchUserQueries($user['email']);
 $userPayments = fetchPaymentsByUserId($user['user_id']);
-// Staff pagination settings.
-$staffLimit = 5;
+$totalUsers = countTotalUsers();
+$usersLimit = 10;
+$usersTotalPages = max(1, (int)ceil($totalUsers / $usersLimit));
+$usersPage = max(1, intval($_GET['page'] ?? 1));
+$usersPage = min($usersPage, $usersTotalPages);
+$usersOffset = ($usersPage - 1) * $usersLimit;
+$users = fetchUsers($usersLimit, $usersOffset);
+$hasNextUsersPage = ($usersOffset + $usersLimit) < $totalUsers;
+$staffLimit = 10;
 $totalStaffUsers = countStaffUsers();
-$staffTotalPages = max(1, ceil($totalStaffUsers / $staffLimit));
+$staffTotalPages = max(1, (int)ceil($totalStaffUsers / $staffLimit));
 $staffPage = max(1, intval($_GET['page'] ?? 1));
 $staffPage = min($staffPage, $staffTotalPages);
 $staffOffset = ($staffPage - 1) * $staffLimit;
 $staffUsers = fetchStaffUsers($staffLimit, $staffOffset);
 $hasNextStaffPage = ($staffOffset + $staffLimit) < $totalStaffUsers;
-$totalUsers = countTotalUsers();
 $totalBookings = countTotalBookings();
 $totalRevenue = sumTotalRevenue();
 $replyQuery = null;
+$editHotel = null;
+$editTransport = null;
 
 if ($section === 'customerQueries' && $task === 'reply' && ($role === 'staff' || $role === 'admin')) {
     $replyQuery = fetchQueryById(intval($_GET['id'] ?? 0));
+}
+
+if ($section === 'hotels' && $task === 'edit' && $role === 'staff') {
+    $editHotel = fetchHotelById(intval($_GET['id'] ?? 0));
+}
+
+if ($section === 'transport' && $task === 'edit' && $role === 'staff') {
+    $editTransport = fetchTransportById(intval($_GET['id'] ?? 0));
 }
 
 $download = trim($_GET['download'] ?? '');
@@ -251,7 +314,7 @@ if ($download === 'report' && $role === 'admin') {
             </div>
 
             <?php if ($actionMessage): ?>
-                <div class="alert alert-success"><?= h($actionMessage) ?></div>
+                <div class="alert alert-<?= h($actionAlertClass) ?>"><?= h($actionMessage) ?></div>
             <?php endif; ?>
 
             <div class="row g-4">
@@ -442,9 +505,18 @@ if ($download === 'report' && $role === 'admin') {
                                         <div class="col-12"><label class="form-label">Itinerary (day|activity per line)</label><textarea class="form-control" name="packageItinerary" rows="3"><?= h($formPackage['itinerary'] ?? '') ?></textarea></div>
                                         <div class="col-12"><label class="form-label">Included (one per line)</label><textarea class="form-control" name="packageIncluded" rows="3"><?= h($formPackage['included'] ?? '') ?></textarea></div>
                                     </div>
-                                    <button class="btn btn-success mt-3"><?= $contentTask === 'edit' ? 'Save Changes' : 'Add Package' ?></button>
-                                    <button type="button" class="btn btn-link mt-3" onclick="window.location.href='dashboard.php?section=managePackages'">Back to list</button>
+                                    <div class="mt-3 d-flex flex-wrap gap-2">
+                                        <button class="btn btn-success"><?= $contentTask === 'edit' ? 'Save Changes' : 'Add Package' ?></button>
+                                        <button type="button" class="btn btn-link" onclick="window.location.href='dashboard.php?section=managePackages'">Back to list</button>
+                                    </div>
                                 </form>
+                                <?php if ($contentTask === 'edit'): ?>
+                                    <form method="post" class="mt-2" onsubmit="return confirm('Delete this package? This cannot be undone.');">
+                                        <input type="hidden" name="action" value="delete_package">
+                                        <input type="hidden" name="package_id" value="<?= h($formPackage['package_id']) ?>">
+                                        <button class="btn btn-outline-danger btn-sm" type="submit">Delete Package</button>
+                                    </form>
+                                <?php endif; ?>
                             <?php else: ?>
                                 <?php if (count($packages)): ?>
                                     <div class="table-responsive dashboard-table-wrapper">
@@ -502,31 +574,113 @@ if ($download === 'report' && $role === 'admin') {
                             <?php endif; ?>
                         <?php elseif ($section === 'hotels'): ?>
                             <h4>Hotels Coordination</h4>
-                            <?php if (count($hotels)): ?>
-                                <div class="list-group">
-                                    <?php foreach ($hotels as $hotel): ?>
-                                        <div class="list-group-item d-flex justify-content-between align-items-center">
-                                            <div>
-                                                <strong><?= h($hotel['name']) ?></strong>
-                                                <div class="text-muted"><?= h($hotel['location']) ?></div>
-                                            </div>
-                                            <span class="badge <?= $hotel['status'] === 'confirmed' ? 'bg-success' : 'bg-warning text-dark' ?>"><?= h(ucfirst($hotel['status'])) ?></span>
+                            <?php if ($editHotel): ?>
+                                <form method="post" class="mb-4">
+                                    <input type="hidden" name="action" value="update_hotel_coordination">
+                                    <input type="hidden" name="hotel_id" value="<?= h($editHotel['hotel_id']) ?>">
+                                    <div class="row g-3">
+                                        <div class="col-md-6">
+                                            <label class="form-label">Hotel</label>
+                                            <input class="form-control" value="<?= h($editHotel['name']) ?>" disabled>
                                         </div>
-                                    <?php endforeach; ?>
+                                        <div class="col-md-6">
+                                            <label class="form-label">Booking Status</label>
+                                            <select class="form-select" name="hotelStatus">
+                                                <option value="confirmed" <?= ($editHotel['status'] ?? '') === 'confirmed' ? 'selected' : '' ?>>Confirmed</option>
+                                                <option value="pending" <?= ($editHotel['status'] ?? '') === 'pending' ? 'selected' : '' ?>>Pending</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label">Contact Person Name</label>
+                                            <input class="form-control" name="hotelContactPersonName" value="<?= h($editHotel['contact_person_name'] ?? '') ?>">
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label">Contact Phone</label>
+                                            <input class="form-control" name="hotelContactPhone" value="<?= h($editHotel['contact_phone'] ?? '') ?>">
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label">Contact Email</label>
+                                            <input class="form-control" type="email" name="hotelContactEmail" value="<?= h($editHotel['contact_email'] ?? '') ?>">
+                                        </div>
+                                    </div>
+                                    <button class="btn btn-primary btn-sm mt-3" type="submit">Save Changes</button>
+                                    <button class="btn btn-link btn-sm mt-3" type="button" onclick="window.location.href='dashboard.php?section=hotels'">Cancel</button>
+                                </form>
+                            <?php endif; ?>
+                            <?php if (count($hotels)): ?>
+                                <div class="table-responsive dashboard-table-wrapper">
+                                    <table class="table table-borderless table-hover align-middle dashboard-table">
+                                        <thead>
+                                            <tr><th>Hotel</th><th>Location</th><th>Contact Person</th><th>Phone</th><th>Email</th><th>Status</th><th>Action</th></tr>
+                                        </thead>
+                                        <tbody>
+                                            <?php foreach ($hotels as $hotel): ?>
+                                                <tr>
+                                                    <td><?= h($hotel['name']) ?></td>
+                                                    <td><?= h($hotel['location']) ?></td>
+                                                    <td><?= h($hotel['contact_person_name'] ?? '') ?></td>
+                                                    <td><?= h($hotel['contact_phone'] ?? '') ?></td>
+                                                    <td><?= h($hotel['contact_email'] ?? '') ?></td>
+                                                    <td><span class="badge <?= $hotel['status'] === 'confirmed' ? 'bg-success' : 'bg-warning text-dark' ?>"><?= h(ucfirst($hotel['status'])) ?></span></td>
+                                                    <td><button class="btn btn-sm btn-outline-primary" type="button" onclick="window.location.href='dashboard.php?section=hotels&task=edit&id=<?= h($hotel['hotel_id']) ?>'">Edit</button></td>
+                                                </tr>
+                                            <?php endforeach; ?>
+                                        </tbody>
+                                    </table>
                                 </div>
                             <?php else: ?>
                                 <p>No hotel records found.</p>
                             <?php endif; ?>
                         <?php elseif ($section === 'transport'): ?>
                             <h4>Transport Providers</h4>
-                            <?php if (count($transports)): ?>
-                                <div class="list-group">
-                                    <?php foreach ($transports as $transportRow): ?>
-                                        <div class="list-group-item d-flex justify-content-between align-items-center">
-                                            <div><?= h($transportRow['type']) ?></div>
-                                            <span class="badge <?= $transportRow['status'] === 'ready' ? 'bg-success' : ($transportRow['status'] === 'confirmed' ? 'bg-primary' : 'bg-info text-dark') ?>"><?= h(ucfirst($transportRow['status'])) ?></span>
+                            <?php if ($editTransport): ?>
+                                <form method="post" class="mb-4">
+                                    <input type="hidden" name="action" value="update_transport_coordination">
+                                    <input type="hidden" name="transport_id" value="<?= h($editTransport['transport_id']) ?>">
+                                    <div class="row g-3">
+                                        <div class="col-md-6">
+                                            <label class="form-label">Transport Type</label>
+                                            <input class="form-control" value="<?= h($editTransport['type']) ?>" disabled>
                                         </div>
-                                    <?php endforeach; ?>
+                                        <div class="col-md-6">
+                                            <label class="form-label">Status</label>
+                                            <select class="form-select" name="transportStatus">
+                                                <option value="ready" <?= ($editTransport['status'] ?? '') === 'ready' ? 'selected' : '' ?>>Ready</option>
+                                                <option value="confirmed" <?= ($editTransport['status'] ?? '') === 'confirmed' ? 'selected' : '' ?>>Confirmed</option>
+                                                <option value="scheduled" <?= ($editTransport['status'] ?? '') === 'scheduled' ? 'selected' : '' ?>>Scheduled</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">Contact Name</label>
+                                            <input class="form-control" name="transportContactName" value="<?= h($editTransport['contact_name'] ?? '') ?>">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">Contact Phone</label>
+                                            <input class="form-control" name="transportContactPhone" value="<?= h($editTransport['contact_phone'] ?? '') ?>">
+                                        </div>
+                                    </div>
+                                    <button class="btn btn-primary btn-sm mt-3" type="submit">Save Changes</button>
+                                    <button class="btn btn-link btn-sm mt-3" type="button" onclick="window.location.href='dashboard.php?section=transport'">Cancel</button>
+                                </form>
+                            <?php endif; ?>
+                            <?php if (count($transports)): ?>
+                                <div class="table-responsive dashboard-table-wrapper">
+                                    <table class="table table-borderless table-hover align-middle dashboard-table">
+                                        <thead>
+                                            <tr><th>Type</th><th>Contact Name</th><th>Contact Phone</th><th>Status</th><th>Action</th></tr>
+                                        </thead>
+                                        <tbody>
+                                            <?php foreach ($transports as $transportRow): ?>
+                                                <tr>
+                                                    <td><?= h($transportRow['type']) ?></td>
+                                                    <td><?= h($transportRow['contact_name'] ?? '') ?></td>
+                                                    <td><?= h($transportRow['contact_phone'] ?? '') ?></td>
+                                                    <td><span class="badge <?= $transportRow['status'] === 'ready' ? 'bg-success' : ($transportRow['status'] === 'confirmed' ? 'bg-primary' : 'bg-info text-dark') ?>"><?= h(ucfirst($transportRow['status'])) ?></span></td>
+                                                    <td><button class="btn btn-sm btn-outline-primary" type="button" onclick="window.location.href='dashboard.php?section=transport&task=edit&id=<?= h($transportRow['transport_id']) ?>'">Edit</button></td>
+                                                </tr>
+                                            <?php endforeach; ?>
+                                        </tbody>
+                                    </table>
                                 </div>
                             <?php else: ?>
                                 <p>No transport data available.</p>
@@ -607,6 +761,23 @@ if ($download === 'report' && $role === 'admin') {
                                         </tbody>
                                     </table>
                                 </div>
+                                <div class="d-flex flex-wrap align-items-center gap-2 mt-3">
+                                    <?php if ($usersPage > 1): ?>
+                                        <a class="btn btn-outline-secondary btn-sm" href="dashboard.php?section=manageUsers&page=<?= h($usersPage - 1) ?>">Previous</a>
+                                    <?php else: ?>
+                                        <button class="btn btn-outline-secondary btn-sm" type="button" disabled>Previous</button>
+                                    <?php endif; ?>
+
+                                    <?php for ($pageNumber = 1; $pageNumber <= $usersTotalPages; $pageNumber++): ?>
+                                        <a class="btn btn-sm <?= $pageNumber === $usersPage ? 'btn-primary' : 'btn-outline-primary' ?>" href="dashboard.php?section=manageUsers&page=<?= h($pageNumber) ?>"><?= h($pageNumber) ?></a>
+                                    <?php endfor; ?>
+
+                                    <?php if ($hasNextUsersPage): ?>
+                                        <a class="btn btn-outline-primary btn-sm" href="dashboard.php?section=manageUsers&page=<?= h($usersPage + 1) ?>">Next</a>
+                                    <?php else: ?>
+                                        <button class="btn btn-outline-primary btn-sm" type="button" disabled>Next</button>
+                                    <?php endif; ?>
+                                </div>
                             <?php else: ?>
                                 <p>No user accounts found.</p>
                             <?php endif; ?>
@@ -639,14 +810,21 @@ if ($download === 'report' && $role === 'admin') {
                                         </tbody>
                                     </table>
                                 </div>
-                                <div class="d-flex gap-2 mt-3">
-                                    <!-- Previous is hidden on page 1. Next is hidden on the last page. -->
+                                <div class="d-flex flex-wrap align-items-center gap-2 mt-3">
                                     <?php if ($staffPage > 1): ?>
                                         <a class="btn btn-outline-secondary btn-sm" href="dashboard.php?section=confirmStaff&page=<?= h($staffPage - 1) ?>">Previous</a>
+                                    <?php else: ?>
+                                        <button class="btn btn-outline-secondary btn-sm" type="button" disabled>Previous</button>
                                     <?php endif; ?>
+
+                                    <?php for ($pageNumber = 1; $pageNumber <= $staffTotalPages; $pageNumber++): ?>
+                                        <a class="btn btn-sm <?= $pageNumber === $staffPage ? 'btn-primary' : 'btn-outline-primary' ?>" href="dashboard.php?section=confirmStaff&page=<?= h($pageNumber) ?>"><?= h($pageNumber) ?></a>
+                                    <?php endfor; ?>
 
                                     <?php if ($hasNextStaffPage): ?>
                                         <a class="btn btn-outline-primary btn-sm" href="dashboard.php?section=confirmStaff&page=<?= h($staffPage + 1) ?>">Next</a>
+                                    <?php else: ?>
+                                        <button class="btn btn-outline-primary btn-sm" type="button" disabled>Next</button>
                                     <?php endif; ?>
                                 </div>
                             <?php else: ?>

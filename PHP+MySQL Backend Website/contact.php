@@ -44,7 +44,7 @@ $activePage = 'contact';
             <div class="row justify-content-center">
                 <div class="col-lg-7">
                     <div class="query-panel">
-                        <h3 class="mb-4 text-center">Submit Your Query</h3>
+                        <h3 class="mb-4 text-center">Submit Your Inquiry</h3>
                         <form id="queryForm" method="post">
                             <div class="mb-3">
                                 <input id="queryName" name="queryName" type="text" class="form-control form-control-lg" placeholder="Name" value="<?= h($_POST['queryName'] ?? $user['full_name'] ?? '') ?>">
