@@ -102,6 +102,7 @@ function ensureSchema() {
         'queries' => [
             'email' => 'VARCHAR(100) DEFAULT NULL',
         ],
+<<<<<<< HEAD
         'hotels' => [
             'contact_person_name' => 'VARCHAR(100) DEFAULT NULL',
             'contact_phone'       => 'VARCHAR(50) DEFAULT NULL',
@@ -111,6 +112,8 @@ function ensureSchema() {
             'contact_name'  => 'VARCHAR(100) DEFAULT NULL',
             'contact_phone' => 'VARCHAR(50) DEFAULT NULL',
         ],
+=======
+>>>>>>> 4879ef52bfb37ce94e2529f2b9dedf97f8eeefca
         'payments' => [
             'user_id' => 'INT(11) DEFAULT NULL',
         ],
@@ -148,6 +151,7 @@ function ensureSchema() {
         ');
     }
 
+<<<<<<< HEAD
     if (configTableExists('hotels') && columnExists('hotels', 'contact_person_name') && columnExists('hotels', 'contact_phone')) {
         $result = $conn->query('SELECT COUNT(*) AS total FROM hotels');
         $hotelCount = $result ? intval($result->fetch_assoc()['total'] ?? 0) : 0;
@@ -214,6 +218,8 @@ function ensureSchema() {
         }
     }
 
+=======
+>>>>>>> 4879ef52bfb37ce94e2529f2b9dedf97f8eeefca
 }
 
 

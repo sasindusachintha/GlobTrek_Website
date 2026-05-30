@@ -50,6 +50,7 @@ CREATE TABLE `hotels` (
   `hotel_id` int(11) NOT NULL,
   `name` varchar(150) DEFAULT NULL,
   `location` varchar(100) DEFAULT NULL,
+<<<<<<< HEAD
   `contact_person_name` varchar(100) DEFAULT NULL,
   `contact_phone` varchar(50) DEFAULT NULL,
   `contact_email` varchar(100) DEFAULT NULL,
@@ -65,6 +66,11 @@ INSERT INTO `hotels` (`hotel_id`, `name`, `location`, `contact_person_name`, `co
 (2, 'Hillview Grand', 'Kandy', 'Asha Fernando', '+94 76 234 5678', NULL, 'confirmed'),
 (3, 'City Lights Inn', 'Colombo', 'Ruwan Silva', '+94 71 345 6789', NULL, 'pending');
 
+=======
+  `status` enum('confirmed','pending') DEFAULT 'pending'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+>>>>>>> 4879ef52bfb37ce94e2529f2b9dedf97f8eeefca
 -- --------------------------------------------------------
 
 --
@@ -170,6 +176,7 @@ CREATE TABLE `reviews` (
 CREATE TABLE `transport` (
   `transport_id` int(11) NOT NULL,
   `type` varchar(100) DEFAULT NULL,
+<<<<<<< HEAD
   `contact_name` varchar(100) DEFAULT NULL,
   `contact_phone` varchar(50) DEFAULT NULL,
   `status` enum('ready','scheduled','confirmed') DEFAULT 'ready'
@@ -184,6 +191,11 @@ INSERT INTO `transport` (`transport_id`, `type`, `contact_name`, `contact_phone`
 (2, 'Private Van', 'Malith Gunasekara', '+94 72 567 8901', 'scheduled'),
 (3, 'Tour Coach', 'Dinuka Samarasinghe', '+94 70 678 9012', 'confirmed');
 
+=======
+  `status` enum('ready','scheduled','confirmed') DEFAULT 'ready'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+>>>>>>> 4879ef52bfb37ce94e2529f2b9dedf97f8eeefca
 -- --------------------------------------------------------
 
 --
@@ -295,7 +307,11 @@ ALTER TABLE `bookings`
 -- AUTO_INCREMENT for table `hotels`
 --
 ALTER TABLE `hotels`
+<<<<<<< HEAD
   MODIFY `hotel_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+=======
+  MODIFY `hotel_id` int(11) NOT NULL AUTO_INCREMENT;
+>>>>>>> 4879ef52bfb37ce94e2529f2b9dedf97f8eeefca
 
 --
 -- AUTO_INCREMENT for table `invoices`
@@ -337,7 +353,11 @@ ALTER TABLE `reviews`
 -- AUTO_INCREMENT for table `transport`
 --
 ALTER TABLE `transport`
+<<<<<<< HEAD
   MODIFY `transport_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+=======
+  MODIFY `transport_id` int(11) NOT NULL AUTO_INCREMENT;
+>>>>>>> 4879ef52bfb37ce94e2529f2b9dedf97f8eeefca
 
 --
 -- AUTO_INCREMENT for table `users`

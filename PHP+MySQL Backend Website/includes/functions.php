@@ -2,7 +2,11 @@
 require_once __DIR__ . '/../config/db.php';
 
 function h($value) {
+<<<<<<< HEAD
     return htmlspecialchars((string)($value ?? ''), ENT_QUOTES, 'UTF-8');
+=======
+    return htmlspecialchars($value, ENT_QUOTES, 'UTF-8');
+>>>>>>> 4879ef52bfb37ce94e2529f2b9dedf97f8eeefca
 }
 
 function assetPath($path, $fallback = '') {
@@ -155,7 +159,10 @@ function fetchPackageById($id) {
     return $result->fetch_assoc();
 }
 
+<<<<<<< HEAD
 // gets images for a specific package from the database (gallery) and returns them as a list.
+=======
+>>>>>>> 4879ef52bfb37ce94e2529f2b9dedf97f8eeefca
 function fetchPackageGallery($packageId, $limit = 4) {
     $limit = intval($limit);
     $imageColumn = columnExists('package_gallery', 'image_path') ? 'image_path' : firstExistingColumn('package_gallery', ['image', 'image_url']);
@@ -246,7 +253,10 @@ function badgeClassForStatus($status) {
     }
 }
 
+<<<<<<< HEAD
 // gets all bookings made by a specific user, along with package details.
+=======
+>>>>>>> 4879ef52bfb37ce94e2529f2b9dedf97f8eeefca
 function fetchBookingsByUserId($userId) {
     $packageTable = packageTable();
     $packageIdColumn = packageIdColumn();
@@ -314,6 +324,7 @@ function fetchHotelRecords() {
     return $result->fetch_all(MYSQLI_ASSOC);
 }
 
+<<<<<<< HEAD
 function fetchHotelById($hotelId) {
     $stmt = query('SELECT * FROM hotels WHERE hotel_id = ?', [$hotelId]);
     $result = $stmt->get_result();
@@ -327,12 +338,15 @@ function updateHotelCoordination($hotelId, $status, $contactPersonName, $contact
     );
 }
 
+=======
+>>>>>>> 4879ef52bfb37ce94e2529f2b9dedf97f8eeefca
 function fetchTransportRecords() {
     $stmt = query('SELECT * FROM transport ORDER BY transport_id ASC');
     $result = $stmt->get_result();
     return $result->fetch_all(MYSQLI_ASSOC);
 }
 
+<<<<<<< HEAD
 function fetchTransportById($transportId) {
     $stmt = query('SELECT * FROM transport WHERE transport_id = ?', [$transportId]);
     $result = $stmt->get_result();
@@ -350,6 +364,10 @@ function fetchUsers($limit, $offset) {
     $limit = intval($limit);
     $offset = intval($offset);
     $stmt = query('SELECT * FROM users ORDER BY user_id ASC LIMIT ? OFFSET ?', [$limit, $offset]);
+=======
+function fetchAllUsers() {
+    $stmt = query('SELECT * FROM users ORDER BY user_id ASC');
+>>>>>>> 4879ef52bfb37ce94e2529f2b9dedf97f8eeefca
     $result = $stmt->get_result();
     return $result->fetch_all(MYSQLI_ASSOC);
 }
@@ -373,6 +391,10 @@ function sumTotalRevenue() {
 }
 
 function fetchStaffUsers($limit, $offset) {
+<<<<<<< HEAD
+=======
+    // Get only one page of staff records.
+>>>>>>> 4879ef52bfb37ce94e2529f2b9dedf97f8eeefca
     $limit = intval($limit);
     $offset = intval($offset);
     $stmt = query('SELECT * FROM users WHERE role = ? ORDER BY user_id ASC LIMIT ? OFFSET ?', ['staff', $limit, $offset]);
@@ -381,6 +403,10 @@ function fetchStaffUsers($limit, $offset) {
 }
 
 function countStaffUsers() {
+<<<<<<< HEAD
+=======
+    // Count all staff records so the Next button only appears when needed.
+>>>>>>> 4879ef52bfb37ce94e2529f2b9dedf97f8eeefca
     $stmt = query('SELECT COUNT(*) AS total FROM users WHERE role = ?', ['staff']);
     $result = $stmt->get_result();
     return intval($result->fetch_assoc()['total'] ?? 0);
@@ -432,16 +458,23 @@ function createPackage(array $data) {
 
 function updatePackage($packageId, array $data) {
     $table = packageTable();
+<<<<<<< HEAD
     $idColumn = packageIdColumn();
     query(
         "UPDATE `$table` SET title = ?, location = ?, description = ?, price = ?, image = ?, category = ?,
          availability = ?, duration = ?, transport = ?, rating = ?, highlights = ?, itinerary = ?, included = ? WHERE `$idColumn` = ?",
+=======
+    query(
+        "UPDATE `$table` SET title = ?, location = ?, description = ?, price = ?, image = ?, category = ?,
+         availability = ?, duration = ?, transport = ?, rating = ?, highlights = ?, itinerary = ?, included = ? WHERE package_id = ?",
+>>>>>>> 4879ef52bfb37ce94e2529f2b9dedf97f8eeefca
         [$data['title'], $data['location'], $data['description'], $data['price'], $data['image'],
          $data['category'], $data['availability'], $data['duration'], $data['transport'], $data['rating'],
          $data['highlights'], $data['itinerary'], $data['included'], $packageId]
     );
 }
 
+<<<<<<< HEAD
 function countPackageReferences($packageId) {
     $total = 0;
 
@@ -477,6 +510,8 @@ function deletePackage($packageId) {
     return db()->affected_rows > 0;
 }
 
+=======
+>>>>>>> 4879ef52bfb37ce94e2529f2b9dedf97f8eeefca
 function updateUserStatus($userId, $status) {
     query('UPDATE users SET status = ? WHERE user_id = ?', [$status, $userId]);
 }

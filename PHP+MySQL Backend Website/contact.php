@@ -1,9 +1,9 @@
 <?php
 define('IN_SITE', true);
-require_once __DIR__ . '/functions.php';
+require_once __DIR__ . '/includes/functions.php';
 $user = currentUser();
 $errorMessage = '';
-success:
+
 $successMessage = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $name = trim($_POST['queryName'] ?? '');
@@ -33,11 +33,11 @@ $activePage = 'contact';
     <title>Contact | GlobeTrek</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="assets/css/style.css">
 </head>
 
 <body>
-    <?php include __DIR__ . '/header.php'; ?>
+    <?php include __DIR__ . '/includes/header.php'; ?>
 
     <main class="page-layout query-page">
         <div class="container">
@@ -129,7 +129,7 @@ $activePage = 'contact';
         </div>
     </section>
 
-    <script src="js/app.js"></script>
+    <script src="assets/js/app.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 

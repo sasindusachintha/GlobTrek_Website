@@ -1,6 +1,6 @@
 <?php
 define('IN_SITE', true);
-require_once __DIR__ . '/functions.php';
+require_once __DIR__ . '/includes/functions.php';
 requireLogin();
 $bookingId = isset($_GET['booking_id']) ? intval($_GET['booking_id']) : 0;
 $booking = fetchBookingById($bookingId);
@@ -52,11 +52,11 @@ $totalValue = $packagePrice + $taxes + $serviceFee;
     <title>Payment | GlobeTrek</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="assets/css/style.css">
 </head>
 
 <body>
-    <?php include __DIR__ . '/header.php'; ?>
+    <?php include __DIR__ . '/includes/header.php'; ?>
 
     <main class="page-layout">
         <div class="container">
@@ -99,7 +99,7 @@ $totalValue = $packagePrice + $taxes + $serviceFee;
                     <div class="summary-panel mb-4">
                         <div class="payment-package-card">
                             <div class="package-thumb">
-                                <img src="<?= h($booking['package_image'] ?? 'images/hero1.jpg') ?>" alt="Package preview">
+                                <img src="<?= h(assetPath($booking['package_image'] ?? '', 'assets/images/hero1.jpg')) ?>" alt="Package preview">
                             </div>
                             <div class="package-summary-text">
                                 <h5 id="paymentPackageName"><?= h($booking['package_title']) ?></h5>
@@ -123,7 +123,7 @@ $totalValue = $packagePrice + $taxes + $serviceFee;
         </div>
     </main>
 
-    <script src="js/app.js"></script>
+    <script src="assets/js/app.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 

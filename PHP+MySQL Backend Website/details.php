@@ -1,6 +1,6 @@
 <?php
 define('IN_SITE', true);
-require_once __DIR__ . '/functions.php';
+require_once __DIR__ . '/includes/functions.php';
 $packageId = isset($_GET['id']) ? intval($_GET['id']) : 0;
 $package = fetchPackageById($packageId);
 if (!$package) {
@@ -8,7 +8,7 @@ if (!$package) {
 }
 $gallery = fetchPackageGallery($packageId, 4);
 while (count($gallery) < 4) {
-    $gallery[] = ['image_path' => $package['image'] ?: 'images/hero1.jpg'];
+    $gallery[] = ['image_path' => assetPath($package['image'] ?? '', 'assets/images/hero1.jpg')];
 }
 $activePage = '';
 ?>
@@ -20,7 +20,7 @@ $activePage = '';
     <title>Package Details | GlobeTrek</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="assets/css/style.css">
     <style>
         .gallery-main {
             width: 100%;
@@ -174,7 +174,7 @@ $activePage = '';
 </head>
 
 <body>
-    <?php include __DIR__ . '/header.php'; ?>
+    <?php include __DIR__ . '/includes/header.php'; ?>
 
     <div class="container mt-5 mb-5">
         <div class="package-header mb-5">
@@ -205,11 +205,11 @@ $activePage = '';
             <div class="col-lg-8">
                 <div class="gallery-grid row g-3">
                     <div class="col-12">
-                        <img id="mainImg" class="gallery-main" src="<?= h($gallery[0]['image_path']) ?>" alt="Main Image">
+                        <img id="mainImg" class="gallery-main" src="<?= h(assetPath($gallery[0]['image_path'], 'assets/images/hero1.jpg')) ?>" alt="Main Image">
                     </div>
-                    <div class="col-4"><img id="img1" class="gallery-side" src="<?= h($gallery[1]['image_path']) ?>" alt="Image 1"></div>
-                    <div class="col-4"><img id="img2" class="gallery-side" src="<?= h($gallery[2]['image_path']) ?>" alt="Image 2"></div>
-                    <div class="col-4"><img id="img3" class="gallery-side" src="<?= h($gallery[3]['image_path']) ?>" alt="Image 3"></div>
+                    <div class="col-4"><img id="img1" class="gallery-side" src="<?= h(assetPath($gallery[1]['image_path'], 'assets/images/hero1.jpg')) ?>" alt="Image 1"></div>
+                    <div class="col-4"><img id="img2" class="gallery-side" src="<?= h(assetPath($gallery[2]['image_path'], 'assets/images/hero1.jpg')) ?>" alt="Image 2"></div>
+                    <div class="col-4"><img id="img3" class="gallery-side" src="<?= h(assetPath($gallery[3]['image_path'], 'assets/images/hero1.jpg')) ?>" alt="Image 3"></div>
                 </div>
             </div>
             <div class="col-lg-4">
@@ -268,7 +268,7 @@ $activePage = '';
         </div>
     </div>
 
-    <script src="js/script.js"></script>
+    <script src="assets/js/script.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 
